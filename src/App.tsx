@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import './App.css'
 import interactionExplorer from './work/interaction-explorer.png'
 import networkValidation from './work/network-validation.png'
@@ -10,6 +11,8 @@ function scrollToSection(id: string) {
 }
 
 function App() {
+  const [configurationExpanded, setConfigurationExpanded] = useState(false)
+
   return (
     <main>
       <section className="personal-hero" id="top">
@@ -89,27 +92,48 @@ function App() {
                 embedded firmware. Teams can set sensible defaults, make targeted overrides where
                 needed, and see which settings a device is using.
               </p>
-              <p>
-                I also built tools for testing configuration choices against difficult signal
-                cases before applying them more widely.
-              </p>
               <p className="personal-result"><strong>What changed:</strong> device behavior can be adjusted remotely without a firmware release.</p>
+              <button
+                className="personal-detail-button"
+                onClick={() => setConfigurationExpanded((expanded) => !expanded)}
+                aria-expanded={configurationExpanded}
+                aria-controls="configuration-details"
+              >
+                {configurationExpanded ? 'Hide implementation details' : 'See how it works'} <span>{configurationExpanded ? '↑' : '↓'}</span>
+              </button>
             </div>
-            <div className="personal-visual-gallery">
-              <figure className="personal-visual personal-visual-light">
-                <img src={remoteConfiguration} alt="A hand-drawn architecture sketch for remote device configuration." />
-                <figcaption>The initial device-side configuration and sync design.</figcaption>
-              </figure>
-              <figure className="personal-visual">
-                <img src={remoteConfigurationFlow} alt="A configuration flow from an operations dashboard to an embedded device." />
-                <figcaption>Configuration moves from the operations interface through backend services to deployed devices.</figcaption>
-              </figure>
-              <figure className="personal-visual">
-                <img src={remoteConfigurationUi} alt="Interface screens for setting device configuration values." />
-                <figcaption>The interface for defining defaults and targeted configuration overrides.</figcaption>
-              </figure>
-            </div>
+            <figure className="personal-visual">
+              <img src={remoteConfigurationFlow} alt="A configuration flow from an operations dashboard to an embedded device." />
+              <figcaption>Configuration moves from the operations interface through backend services to deployed devices.</figcaption>
+            </figure>
           </div>
+          {configurationExpanded && (
+            <div className="shell configuration-details" id="configuration-details">
+              <div>
+                <p className="personal-case-number">HOW IT WORKS</p>
+                <h3>Settings, delivery, and feedback.</h3>
+                <p>
+                  A user can define a default setting or a targeted override. The backend resolves
+                  the right configuration for each device, and the firmware receives it during its
+                  next sync. The device then reports its current state back.
+                </p>
+                <p>
+                  Before applying a change more widely, I used signal-analysis tools to test the
+                  configuration against difficult cases.
+                </p>
+              </div>
+              <div className="configuration-detail-images">
+                <figure className="personal-visual">
+                  <img src={remoteConfigurationUi} alt="Interface screens for setting device configuration values." />
+                  <figcaption>The interface for defining defaults and targeted overrides.</figcaption>
+                </figure>
+                <figure className="personal-visual personal-visual-light">
+                  <img src={remoteConfiguration} alt="A hand-drawn sketch of device-side configuration and syncing." />
+                  <figcaption>An early device-side configuration and sync design.</figcaption>
+                </figure>
+              </div>
+            </div>
+          )}
         </article>
 
         <article className="personal-case personal-case-warm">

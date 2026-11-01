@@ -1328,6 +1328,21 @@
   color: #d0c37d;
 }
 
+.personal-detail-button {
+  margin-top: 26px;
+  padding: 0 0 5px;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  color: #455a50;
+  background: transparent;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.personal-detail-button span {
+  margin-left: 14px;
+}
+
 .personal-visual {
   margin: 0;
 }
@@ -1373,6 +1388,42 @@
   max-height: 250px;
 }
 
+.configuration-details {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.62fr) minmax(0, 1.38fr);
+  gap: 75px;
+  margin-top: 54px;
+  padding-top: 50px;
+  border-top: 1px solid #d5d9d3;
+}
+
+.configuration-details h3 {
+  margin: 16px 0 0;
+  color: #27322e;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.configuration-details > div > p:not(.personal-case-number) {
+  margin: 17px 0 0;
+  color: #657069;
+  font-size: 0.9rem;
+  line-height: 1.68;
+}
+
+.configuration-detail-images {
+  display: grid;
+  grid-template-columns: 1.18fr 0.82fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.configuration-detail-images .personal-visual img {
+  max-height: 320px;
+}
+
 .personal-case-dark .personal-visual figcaption {
   color: #9eaaa1;
 }
@@ -1411,7 +1462,8 @@
 @media (max-width: 880px) {
   .personal-intro,
   .personal-case-grid,
-  .personal-about-grid {
+  .personal-about-grid,
+  .configuration-details {
     grid-template-columns: 1fr;
     gap: 38px;
   }
