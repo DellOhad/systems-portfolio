@@ -1236,8 +1236,26 @@
 }
 
 .personal-work {
+  display: flex;
+  flex-direction: column;
   padding-top: 110px;
   background: #f5f2eb;
+}
+
+.personal-section-heading {
+  order: 0;
+}
+
+.configuration-case {
+  order: 1;
+}
+
+.exploration-case {
+  order: 2;
+}
+
+.personal-case-warm {
+  order: 3;
 }
 
 .personal-section-heading {

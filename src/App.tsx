@@ -55,10 +55,10 @@ function App() {
           <p>Real projects, shown at the level I can share publicly.</p>
         </div>
 
-        <article className="personal-case personal-case-dark">
+        <article className="personal-case personal-case-dark exploration-case">
           <div className="shell personal-case-grid">
             <div>
-              <p className="personal-case-number">01 / EXPLORATION</p>
+              <p className="personal-case-number">02 / EXPLORATION</p>
               <h2>Making a difficult investigation easier to follow.</h2>
               <p>
                 I built an investigation workspace for a problem that previously meant opening
@@ -77,10 +77,10 @@ function App() {
           </div>
         </article>
 
-        <article className="personal-case">
+        <article className="personal-case configuration-case">
           <div className="shell personal-case-grid reverse">
             <div>
-              <p className="personal-case-number">02 / CONFIGURATION</p>
+              <p className="personal-case-number">01 / CONFIGURATION</p>
               <h2>A simpler way to tune devices in the field.</h2>
               <p>
                 A change in how a device interprets its sensor signal used to require preparing
