@@ -1,4 +1,7 @@
 import './App.css'
+import interactionExplorer from './work/interaction-explorer.png'
+import networkValidation from './work/network-validation.png'
+import remoteConfiguration from './work/remote-configuration.png'
 
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -63,7 +66,7 @@ function App() {
               <p className="personal-result"><strong>What changed:</strong> a long, fragmented investigation became a guided one.</p>
             </div>
             <figure className="personal-visual">
-              <img src="./work/interaction-explorer.png" alt="An investigation workspace showing an event timeline and signals." />
+              <img src={interactionExplorer} alt="An investigation workspace showing an event timeline and signals." />
               <figcaption>An approved example of the investigation workspace.</figcaption>
             </figure>
           </div>
@@ -86,7 +89,7 @@ function App() {
               <p className="personal-result"><strong>What changed:</strong> behavior can be adjusted remotely, without redeploying firmware.</p>
             </div>
             <figure className="personal-visual personal-visual-light">
-              <img src="./work/remote-configuration.png" alt="A hand-drawn architecture sketch for remote device configuration." />
+              <img src={remoteConfiguration} alt="A hand-drawn architecture sketch for remote device configuration." />
               <figcaption>A working architecture sketch: configuration reaches the device and is applied on its next sync.</figcaption>
             </figure>
           </div>
@@ -108,7 +111,7 @@ function App() {
               <p className="personal-result"><strong>What changed:</strong> connectivity issues are visible before they become launch-day surprises.</p>
             </div>
             <figure className="personal-visual">
-              <img src="./work/network-validation.png" alt="A three-dimensional network validation view of a site." />
+              <img src={networkValidation} alt="A three-dimensional network validation view of a site." />
               <figcaption>An approved example of the network-validation view.</figcaption>
             </figure>
           </div>
