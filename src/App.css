@@ -1290,7 +1290,7 @@
   grid-column: 2;
 }
 
-.personal-case-grid.reverse .personal-visual {
+.personal-case-grid.reverse > .personal-visual {
   grid-column: 1;
   grid-row: 1;
 }
@@ -1417,7 +1417,7 @@
   }
 
   .personal-case-grid.reverse > div,
-  .personal-case-grid.reverse .personal-visual {
+  .personal-case-grid.reverse > .personal-visual {
     grid-column: auto;
     grid-row: auto;
   }
