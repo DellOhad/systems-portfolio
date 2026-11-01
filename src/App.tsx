@@ -2,6 +2,8 @@ import './App.css'
 import interactionExplorer from './work/interaction-explorer.png'
 import networkValidation from './work/network-validation.png'
 import remoteConfiguration from './work/remote-configuration.png'
+import remoteConfigurationFlow from './work/remote-configuration-flow.png'
+import remoteConfigurationUi from './work/remote-configuration-ui.png'
 
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -76,22 +78,37 @@ function App() {
           <div className="shell personal-case-grid reverse">
             <div>
               <p className="personal-case-number">02 / CONFIGURATION</p>
-              <h2>Changing device behavior without making a new release.</h2>
+              <h2>A simpler way to tune devices in the field.</h2>
               <p>
-                Some changes should not have to wait for a firmware release. I designed the path
-                from a cloud-managed setting to a deployed embedded device so configuration could
-                evolve safely in the field.
+                A change in how a device interprets its sensor signal used to require preparing
+                and releasing new firmware. I built the complete path for making those changes
+                remotely instead.
               </p>
               <p>
-                Alongside the system itself, I made tools for exploring how configuration choices
-                behave against difficult, long-tail cases.
+                The work connected an operations interface, backend configuration rules, and
+                embedded firmware. Teams can set sensible defaults, make targeted overrides where
+                needed, and see which settings a device is using.
               </p>
-              <p className="personal-result"><strong>What changed:</strong> behavior can be adjusted remotely, without redeploying firmware.</p>
+              <p>
+                I also built tools for testing configuration choices against difficult signal
+                cases before applying them more widely.
+              </p>
+              <p className="personal-result"><strong>What changed:</strong> device behavior can be adjusted remotely without a firmware release.</p>
             </div>
-            <figure className="personal-visual personal-visual-light">
-              <img src={remoteConfiguration} alt="A hand-drawn architecture sketch for remote device configuration." />
-              <figcaption>A working architecture sketch: configuration reaches the device and is applied on its next sync.</figcaption>
-            </figure>
+            <div className="personal-visual-gallery">
+              <figure className="personal-visual personal-visual-light">
+                <img src={remoteConfiguration} alt="A hand-drawn architecture sketch for remote device configuration." />
+                <figcaption>The initial device-side configuration and sync design.</figcaption>
+              </figure>
+              <figure className="personal-visual">
+                <img src={remoteConfigurationFlow} alt="A configuration flow from an operations dashboard to an embedded device." />
+                <figcaption>Configuration moves from the operations interface through backend services to deployed devices.</figcaption>
+              </figure>
+              <figure className="personal-visual">
+                <img src={remoteConfigurationUi} alt="Interface screens for setting device configuration values." />
+                <figcaption>The interface for defining defaults and targeted configuration overrides.</figcaption>
+              </figure>
+            </div>
           </div>
         </article>
 
