@@ -21,8 +21,11 @@
   td { padding: 4px 6px; border-top: 1px solid #f5f5f4; white-space: nowrap; }
   tr.row { cursor: pointer; }
   tr.hit td { background: var(--hit); }
-  .action { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 14px; }
-  .nudge { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--ink); font-size: 13px; white-space: nowrap; }
+  .action { display: flex; justify-content: flex-end; align-items: center; gap: 10px; min-height: 58px; margin-top: 14px; }
+  .nudge { display: flex; flex: none; align-items: center; gap: 5px; width: 170px; margin: 0; color: var(--red); font: 700 18px/1 "Bradley Hand", "Segoe Print", "Comic Sans MS", cursive; letter-spacing: 0.01em; white-space: normal; transform: translateX(12px) rotate(-5deg); }
+  .nudge span { display: inline-block; }
+  .nudge span:first-child { transform: translateY(-4px) rotate(-3deg); }
+  .nudge span:nth-child(2) { transform: translateY(3px) rotate(2deg); }
   .arrow { width: 46px; height: 16px; flex: none; animation: point 0.9s ease-in-out infinite; }
   @keyframes point {
     0%, 100% { transform: translateX(0); }
@@ -106,7 +109,7 @@
       <section class="sheet"><div class="filehead"><span>people.csv</span><span>date, person, window</span></div><div class="scroller" id="people"></div></section>
     </div>
     <div class="action">
-      <p class="nudge">Confusing? Push here <svg class="arrow" viewBox="0 0 52 16" aria-hidden="true"><line x1="1" y1="8" x2="36" y2="8" stroke="currentColor" stroke-width="1.75"></line><polyline points="28,2.5 46,8 28,13.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter"></polyline></svg></p>
+      <p class="nudge"><span>Confusing?</span><span>Push here</span><svg class="arrow" viewBox="0 0 52 16" aria-hidden="true"><line x1="1" y1="8" x2="36" y2="8" stroke="currentColor" stroke-width="1.75"></line><polyline points="28,2.5 46,8 28,13.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter"></polyline></svg></p>
       <button class="viz" id="viz" type="button">Visualize it</button>
     </div>
   </div>
@@ -187,15 +190,27 @@ function renderTables() {
     });
   });
   visit.shelves.forEach((shelf) => {
-    const step = Math.max(1, Math.floor(shelf.t.length / 6));
-    for (let i = 0; i < shelf.t.length; i += step) {
-      signals.push({ cells: [visit.date, shelf.t[i].toFixed(2), shelf.name, shelf.v[i]] });
+    const chunks = 4;
+    const chunkSize = Math.ceil(shelf.t.length / chunks);
+    for (let start = 0; start < shelf.t.length; start += chunkSize) {
+      const end = Math.min(start + chunkSize, shelf.t.length);
+      signals.push({
+        cells: [
+          visit.date,
+          shelf.t[start].toFixed(2) + "–" + shelf.t[end - 1].toFixed(2),
+          shelf.name,
+          "[" + shelf.v.slice(start, end).map((value) => Number(value).toFixed(1)).join(", ") + "]",
+        ],
+      });
     }
   });
   events.sort((a, b) => String(a.cells[1]).localeCompare(String(b.cells[1])));
   document.getElementById("events").innerHTML = sheetTable(["date", "time", "shelf", "grams", "dir"], events);
-  document.getElementById("signals").innerHTML = sheetTable(["date", "sec", "shelf", "signal"], signals);
-  document.getElementById("people").innerHTML = sheetTable(["date", "person", "start", "area"], [{ cells: [visit.date, visit.person, visit.time, visit.place] }]);
+  document.getElementById("signals").innerHTML = sheetTable(["date", "range", "shelf", "signal"], signals);
+  document.getElementById("people").innerHTML = sheetTable(["date", "person", "start", "area"], [
+    { cells: [visit.date, visit.person, visit.time, visit.place] },
+    { cells: [visit.date, "P2", "08:14:27", visit.place] },
+  ]);
   reportHeight();
 }
 function pieSvg(item) {

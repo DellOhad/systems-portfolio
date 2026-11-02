@@ -96,16 +96,17 @@ function App() {
           <div className="shell exploration-layout">
             <div>
               <p className="personal-case-number">02 / EXPLORATION</p>
-              <h2>Making a difficult investigation easier to follow.</h2>
+              <h2>Turning fragmented data into focused investigation.</h2>
               <p>
-                I built an investigation workspace for a problem that previously meant opening
-                several sources, collecting fragments by hand, and reconstructing one case at a time.
+                I built an investigation workspace that replaced manual work across several data
+                sources with one connected view of a case.
               </p>
               <p>
-                The result brings the relevant signals, events, and possible interpretations into
-                one place, so the person investigating can ask better questions sooner.
+                Bringing together the relevant signals, events, and possible interpretations made
+                investigations faster and easier to follow—helping the R&amp;D team focus on the
+                real issue, understand edge cases, and spend less time assembling evidence.
               </p>
-              <p className="personal-result"><strong>What changed:</strong> a long, fragmented investigation became a guided one.</p>
+              <p className="personal-result"><strong>What changed:</strong> the R&amp;D team could investigate the right issue faster, with a clearer view of complex behavior.</p>
             </div>
             <figure className="exploration-demo exploration-tables">
               <iframe
@@ -133,15 +134,15 @@ function App() {
               <h2>Changing device behavior should not require a new release.</h2>
               <p className="personal-subheading">THE PROBLEM</p>
               <p>
-                The same detector runs across different shelf mechanics and environments. Its
-                default settings work in most cases, but some conditions need more precise tuning
-                to keep event detection reliable.
+                The same detector runs across different shelf mechanics and environments.
+                Adapting it to specific conditions previously required building and deploying a
+                dedicated firmware version for each configuration.
               </p>
               <p className="personal-subheading">HIGH-LEVEL SOLUTION</p>
               <p>
-                I built a centrally managed configuration layer. Teams can select a reusable
-                detector profile as a default, product-level, or shelf-level override; the system
-                resolves the most specific setting and synchronizes only the devices that need it.
+                I built a centrally managed configuration layer that lets operators define
+                detector settings remotely by product category or individual shelf, and
+                synchronizes updates only to the affected devices.
               </p>
               <p className="personal-result"><strong>What changed:</strong> device behavior can be tuned remotely, persistently, and without a firmware release.</p>
               <button
@@ -155,22 +156,23 @@ function App() {
             </div>
             <figure className="personal-visual">
               <img src={remoteConfigurationFlow} alt="A configuration flow from an operations dashboard to an embedded device." />
-              <figcaption>Configuration moves from the operations interface through backend services to deployed devices.</figcaption>
+              <figcaption>Configuration moves to deployed devices through backend services from the operations interface.</figcaption>
             </figure>
           </div>
           {configurationExpanded && (
             <div className="shell configuration-details" id="configuration-details">
               <div>
                 <p className="personal-case-number">HOW IT WORKS</p>
-                <h3>Choose, resolve, apply safely.</h3>
+                <h3>A full path from the dashboard to live device behavior.</h3>
                 <p>
-                  A dashboard assigns reusable profiles at default, product, or shelf scope. During
-                  synchronization, the management layer resolves shelf override first, then product
-                  override, then the default profile—and compares it with the device’s current state.
+                  I designed the end-to-end path for changing device configuration: dashboard
+                  configuration, backend synchronization and command delivery, then on-device
+                  persistence and status reporting.
                 </p>
                 <p>
-                  When a change is needed, the device stores it in non-volatile memory and reloads
-                  the detector safely between events. The setting remains in place after a restart.
+                  On the embedded side, concurrent tasks detect the update and reload safely
+                  between events. The device stores the setting in non-volatile memory and reports
+                  its active state back to the management layer, so the change survives a restart.
                 </p>
               </div>
               <div className="configuration-detail-images">
