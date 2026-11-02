@@ -133,16 +133,17 @@ function App() {
               <h2>Changing device behavior should not require a new release.</h2>
               <p className="personal-subheading">THE PROBLEM</p>
               <p>
-                Even a small adjustment to how a deployed device interprets sensor data meant
-                preparing, releasing, and deploying new firmware.
+                The same detector runs across different shelf mechanics and environments. Its
+                default settings work in most cases, but some conditions need more precise tuning
+                to keep event detection reliable.
               </p>
               <p className="personal-subheading">HIGH-LEVEL SOLUTION</p>
               <p>
-                I separated configuration from firmware. Teams can set defaults or targeted
-                overrides, while the backend delivers the right setting to each device during its
-                normal sync.
+                I built a centrally managed configuration layer. Teams can select a reusable
+                detector profile as a default, product-level, or shelf-level override; the system
+                resolves the most specific setting and synchronizes only the devices that need it.
               </p>
-              <p className="personal-result"><strong>What changed:</strong> device behavior can be adjusted remotely without a firmware release.</p>
+              <p className="personal-result"><strong>What changed:</strong> device behavior can be tuned remotely, persistently, and without a firmware release.</p>
               <button
                 className="personal-detail-button"
                 onClick={() => setConfigurationExpanded((expanded) => !expanded)}
@@ -161,15 +162,15 @@ function App() {
             <div className="shell configuration-details" id="configuration-details">
               <div>
                 <p className="personal-case-number">HOW IT WORKS</p>
-                <h3>Settings, delivery, and feedback.</h3>
+                <h3>Choose, resolve, apply safely.</h3>
                 <p>
-                  A user can define a default setting or a targeted override. The backend resolves
-                  the right configuration for each device, and the firmware receives it during its
-                  next sync. The device then reports its current state back.
+                  A dashboard assigns reusable profiles at default, product, or shelf scope. During
+                  synchronization, the management layer resolves shelf override first, then product
+                  override, then the default profile—and compares it with the device’s current state.
                 </p>
                 <p>
-                  Before applying a change more widely, I used signal-analysis tools to test the
-                  configuration against difficult cases.
+                  When a change is needed, the device stores it in non-volatile memory and reloads
+                  the detector safely between events. The setting remains in place after a restart.
                 </p>
               </div>
               <div className="configuration-detail-images">
