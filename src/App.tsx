@@ -132,7 +132,7 @@ function App() {
           <div className="shell personal-case-grid reverse">
             <div>
               <p className="personal-case-number">01 / CONFIGURATION</p>
-              <h2>Changing device behavior should not require a new release.</h2>
+              <h2>Changing device configuration should not require a new release.</h2>
               <p className="personal-subheading">THE PROBLEM</p>
               <p>
                 The same detector runs across different shelf mechanics and environments.
