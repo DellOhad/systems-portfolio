@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import './App.css'
 import interactionExplorer from './work/interaction-explorer.png'
-import networkValidation from './work/network-validation.png'
 import remoteConfiguration from './work/remote-configuration.png'
 import remoteConfigurationFlow from './work/remote-configuration-flow.png'
 import remoteConfigurationUi from './work/remote-configuration-ui.png'
@@ -160,7 +159,7 @@ function App() {
         </article>
 
         <article className="personal-case personal-case-warm">
-          <div className="shell personal-case-grid">
+          <div className="shell validation-case">
             <div>
               <p className="personal-case-number">03 / VALIDATION</p>
               <h2>Seeing network readiness before a site goes live.</h2>
@@ -174,9 +173,12 @@ function App() {
               </p>
               <p className="personal-result"><strong>What changed:</strong> connectivity issues are visible before they become launch-day surprises.</p>
             </div>
-            <figure className="personal-visual">
-              <img src={networkValidation} alt="A three-dimensional network validation view of a site." />
-              <figcaption>An approved example of the network-validation view.</figcaption>
+            <figure className="validation-demo">
+              <iframe
+                title="Synthetic network validation view"
+                src={`${import.meta.env.BASE_URL}network-validation.html`}
+              />
+              <figcaption>A synthetic site. Shelves, access points, and readings are invented.</figcaption>
             </figure>
           </div>
         </article>

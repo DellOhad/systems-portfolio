@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>WiFi shelf map · sample data</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+  :root {
+    --ink: #142033;
+    --muted: #5d6b7c;
+    --line: #e3e8ef;
+    --field: #f5f7fa;
+    --canvas: #eef1f5;
+    --card: #fff;
+    --accent: #1d4ed8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--canvas);
+    color: var(--ink);
+    font: 14px/1.4 Inter, "Segoe UI", sans-serif;
+  }
+  .page {
+    width: min(1440px, calc(100% - 32px));
+    margin: 16px auto 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .banner {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+  }
+  .filters { padding: 16px 16px 12px; }
+  .label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .grid3 { display: grid; grid-template-columns: 1.4fr 1fr 0.8fr; gap: 14px; }
+  .row2 {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr) 140px;
+    gap: 14px;
+    align-items: end;
+    margin-top: 14px;
+  }
+  .chipbox {
+    min-height: 74px;
+    padding: 8px;
+    border: 1px solid #e7ecf2;
+    border-radius: 12px;
+    background: #f8fafc;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-content: flex-start;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 7px;
+    background: #e8eef8;
+    color: #1e3a5f;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .chip button {
+    border: 0;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+  }
+  .add {
+    height: 26px;
+    border: 1px dashed #cfd6e0;
+    background: white;
+    border-radius: 7px;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 0 8px;
+    cursor: pointer;
+  }
+  input[type="text"], input[type="search"] {
+    width: 100%;
+    height: 40px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--field);
+    padding: 0 12px;
+    font: inherit;
+    color: var(--ink);
+  }
+  .segmented { display: flex; gap: 14px; height: 40px; align-items: center; }
+  .segmented label { display: flex; gap: 6px; align-items: center; font-weight: 600; cursor: pointer; }
+  .hint { margin: 6px 0 0; font-size: 12px; color: var(--muted); }
+  .ranges { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; padding: 14px 18px 18px; }
+  .scale { position: relative; height: 36px; margin-top: 8px; }
+  .scale input[type="range"] {
+    position: absolute; left: 0; right: 0; width: 100%; pointer-events: none; appearance: none;
+    background: transparent; height: 36px; margin: 0;
+  }
+  .scale input[type="range"]::-webkit-slider-thumb {
+    pointer-events: auto; appearance: none; width: 16px; height: 16px; border-radius: 50%;
+    background: #fff; border: 2px solid #334155; cursor: pointer;
+  }
+  .track {
+    position: absolute; left: 0; right: 0; top: 16px; height: 4px; background: #d5dbe3; border-radius: 4px;
+  }
+  .ticks { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; }
+  .workspace { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 12px; }
+  .inspector { display: flex; flex-direction: column; gap: 12px; }
+  .panel { padding: 12px; }
+  .panel h2 { margin: 0 0 8px; font-size: 14px; }
+  textarea {
+    width: 100%; min-height: 88px; resize: vertical; border: 1px solid var(--line);
+    border-radius: 10px; background: var(--field); padding: 10px; font: 12px/1.45 ui-monospace, monospace;
+    color: var(--ink);
+  }
+  textarea.grow { min-height: 280px; }
+  .quiet {
+    margin-top: 8px; height: 34px; padding: 0 12px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--field); font-weight: 600; cursor: pointer;
+  }
+  .stage { position: relative; min-height: 720px; }
+  #plot { height: 720px; }
+  .border-toggle {
+    position: absolute; top: 12px; right: 16px; z-index: 2;
+    background: #fff; border: 1px solid var(--line); border-radius: 8px;
+    padding: 4px 8px; font-size: 12px; font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="banner">Sample floor · invented readings, not a live site</div>
+  <section class="card filters">
+    <div class="grid3">
+      <div>
+        <span class="label">Part number</span>
+        <div class="chipbox" id="pn-box"></div>
+      </div>
+      <div>
+        <span class="label">Access point</span>
+        <div class="chipbox" id="ap-box"></div>
+      </div>
+      <div>
+        <span class="label">Channel</span>
+        <div class="chipbox" id="ch-box"></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div>
+        <span class="label">Find shelves</span>
+        <input id="find" type="search" placeholder="Hostname, shelf name, or planogram. Separate with a comma or a space." />
+      </div>
+      <div>
+        <span class="label">Color shelves by</span>
+        <div class="segmented" id="color-by">
+          <label><input type="radio" name="color" value="stability" /> Stability</label>
+          <label><input type="radio" name="color" value="rssi" /> RSSI</label>
+          <label><input type="radio" name="color" value="snr" checked /> SNR</label>
+          <label><input type="radio" name="color" value="ap" /> Access point</label>
+        </div>
+      </div>
+      <div>
+        <span class="label">Event window</span>
+        <input id="window" type="text" value="7d" />
+        <p class="hint">7d, 12h, or 30m</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card ranges">
+    <div>
+      <span class="label">RSSI</span>
+      <div class="scale" id="rssi-scale">
+        <div class="track"></div>
+        <input type="range" id="rssi-min" min="-100" max="0" value="-100" />
+        <input type="range" id="rssi-max" min="-100" max="0" value="0" />
+      </div>
+      <div class="ticks" id="rssi-ticks"></div>
+    </div>
+    <div>
+      <span class="label">SNR</span>
+      <div class="scale" id="snr-scale">
+        <div class="track"></div>
+        <input type="range" id="snr-min" min="0" max="70" value="0" />
+        <input type="range" id="snr-max" min="0" max="70" value="70" />
+      </div>
+      <div class="ticks" id="snr-ticks"></div>
+    </div>
+  </section>
+
+  <section class="workspace">
+    <aside class="inspector">
+      <div class="card panel">
+        <h2>Selected shelf</h2>
+        <textarea id="selected" readonly placeholder="Click a shelf on the map."></textarea>
+      </div>
+      <div class="card panel">
+        <h2>Disconnected</h2>
+        <textarea id="disconnected" class="grow" readonly></textarea>
+        <button class="quiet" id="download" type="button">Download</button>
+      </div>
+    </aside>
+    <div class="card stage">
+      <label class="border-toggle"><input type="checkbox" id="borders" checked /> Out borders</label>
+      <div id="plot"></div>
+    </div>
+  </section>
+</div>
+<script>
+const PARTS = ["SL 10", "SL 24", "SL 40", "WD 15", "WD 32", "END 5", "CAP 8", "BAY 2"];
+const PLANOS = ["PL-A1", "PL-B4", "PL-C2", "PL-D7", "PL-E3", "PL-F8"];
+const CHANNELS = [1, 6, 11, 36, 44];
+const APS = [1, 2, 3, 4, 5, 6, 7, 8];
+const AP_COLORS = ["#2563eb", "#f59e0b", "#16a34a", "#dc2626", "#7c3aed", "#0891b2", "#db2777", "#65a30d"];
+const OUTLINE = [[400,400],[4400,400],[4400,1000],[4000,1000],[4000,3300],[700,3300],[700,2500],[400,2500],[400,400]];
+
+function mulberry32(seed) {
+  return function () {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const rand = mulberry32(20261102);
+const pick = (list) => list[Math.floor(rand() * list.length)];
+
+function areaAccessPoint(x, y) {
+  const col = x < 1550 ? 0 : x < 2300 ? 1 : x < 3050 ? 2 : 3;
+  const row = y < 1750 ? 0 : 1;
+  const ap = 1 + row * 4 + col;
+  return { ap, channel: CHANNELS[ap % CHANNELS.length] };
+}
+
+const shelves = [];
+let serial = 1000;
+const runs = [
+  [2, 800, 620, 16],
+  [4, 800, 1040, 16],
+  [6, 800, 1460, 16],
+  [8, 800, 1880, 14],
+  [10, 1100, 2300, 12],
+  [12, 1400, 2720, 10],
+  [14, 3900, 620, 8],
+];
+for (const [gondola, x0, y0, n] of runs) {
+  const vertical = gondola === 14;
+  for (let m = 1; m <= n; m++) {
+    const part = pick(PARTS);
+    const plano = pick(PLANOS);
+    const weak = gondola === 8 && m >= 8 && m <= 11;
+    const deadMod = gondola === 4 && m === 3;
+    for (let s = 0; s < 5; s++) {
+      const dead = deadMod || (gondola === 10 && m === 6 && s === 2);
+      let snr, rssi, shelfAp, shelfCh, events;
+      if (dead) {
+        snr = 0; rssi = 0; shelfAp = 0; shelfCh = 0; events = 9;
+      } else if (weak) {
+        snr = 3 + Math.floor(rand() * 9);
+        rssi = -88 + Math.floor(rand() * 10);
+        events = 4 + Math.floor(rand() * 6);
+      } else {
+        snr = 18 + Math.floor(rand() * 32);
+        rssi = -64 + Math.floor(rand() * 24);
+        events = Math.floor(rand() * 3);
+      }
+      const x = vertical ? x0 : x0 + (m - 1) * 180;
+      const y = vertical ? y0 + (m - 1) * 180 : y0;
+      const area = areaAccessPoint(x, y);
+      if (!dead) { shelfAp = area.ap; shelfCh = area.channel; }
+      shelves.push({
+        hostname: "DEMO-" + String(serial++).padStart(4, "0"),
+        part, plano, gondola, mod: m, shelf: s,
+        name: gondola + "." + m + "." + s,
+        rssi, snr, ap: shelfAp, channel: shelfCh, events,
+        x, y, z: 18 + s * 42, w: vertical ? 70 : 150, d: vertical ? 150 : 60, h: 6,
+      });
+    }
+  }
+}
+
+const state = {
+  parts: new Set(PARTS),
+  aps: new Set(APS.concat([0])),
+  channels: new Set(CHANNELS.concat([0])),
+  color: "snr",
+  query: "",
+  rssi: [-100, 0],
+  snr: [0, 70],
+  borders: true,
+};
+
+function mix(a, b, t) { return Math.round(a + (b - a) * t); }
+function rgb(r, g, b) { return "rgb(" + r + "," + g + "," + b + ")"; }
+function ramp(value, stops) {
+  if (value <= stops[0][0]) return rgb(...stops[0][1]);
+  for (let i = 0; i < stops.length - 1; i++) {
+    const [p0, c0] = stops[i], [p1, c1] = stops[i + 1];
+    if (value <= p1) {
+      const t = (value - p0) / (p1 - p0);
+      return rgb(mix(c0[0], c1[0], t), mix(c0[1], c1[1], t), mix(c0[2], c1[2], t));
+    }
+  }
+  return rgb(...stops[stops.length - 1][1]);
+}
+function shelfColor(shelf) {
+  if (shelf.ap === 0) return "#1a1a1a";
+  if (state.color === "ap") return AP_COLORS[(shelf.ap - 1) % AP_COLORS.length];
+  if (state.color === "rssi") return ramp(shelf.rssi, [[-80,[185,28,28]],[-70,[250,204,21]],[-60,[34,197,94]]]);
+  if (state.color === "stability") return ramp(shelf.events, [[0,[34,197,94]],[3,[250,204,21]],[10,[185,28,28]]]);
+  return ramp(shelf.snr, [[5,[185,28,28]],[10,[250,204,21]],[15,[34,197,94]]]);
+}
+
+function matchesQuery(shelf) {
+  const q = state.query.trim().toLowerCase();
+  if (!q) return true;
+  const hay = (shelf.hostname + " " + shelf.name + " " + shelf.plano).toLowerCase();
+  return q.split(/[\s,]+/).filter(Boolean).some((token) => hay.includes(token));
+}
+function visibleShelves() {
+  return shelves.filter((shelf) =>
+    state.parts.has(shelf.part) &&
+    state.aps.has(shelf.ap) &&
+    state.channels.has(shelf.channel) &&
+    shelf.rssi >= state.rssi[0] && shelf.rssi <= state.rssi[1] &&
+    shelf.snr >= state.snr[0] && shelf.snr <= state.snr[1] &&
+    matchesQuery(shelf)
+  );
+}
+
+function chips(boxId, values, selected, labelOf) {
+  const box = document.getElementById(boxId);
+  box.innerHTML = "";
+  values.forEach((value) => {
+    if (!selected.has(value)) return;
+    const chip = document.createElement("span");
+    chip.className = "chip";
+    chip.textContent = labelOf(value);
+    const close = document.createElement("button");
+    close.type = "button";
+    close.textContent = "×";
+    close.addEventListener("click", () => { selected.delete(value); draw(); });
+    chip.appendChild(close);
+    box.appendChild(chip);
+  });
+  const hidden = values.filter((value) => !selected.has(value));
+  if (hidden.length) {
+    const add = document.createElement("button");
+    add.type = "button";
+    add.className = "add";
+    add.textContent = "+";
+    add.title = hidden.map(labelOf).join(", ");
+    add.addEventListener("click", () => { hidden.forEach((value) => selected.add(value)); draw(); });
+    box.appendChild(add);
+  }
+}
+function ticks(id, min, max, step) {
+  const row = document.getElementById(id);
+  row.innerHTML = "";
+  for (let n = min; n <= max; n += step) {
+    const span = document.createElement("span");
+    span.textContent = String(n);
+    row.appendChild(span);
+  }
+}
+
+function disconnectedText(list) {
+  const groups = new Map();
+  list.filter((shelf) => shelf.ap === 0).forEach((shelf) => {
+    const key = shelf.gondola + "." + shelf.mod;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(shelf);
+  });
+  const lines = [];
+  [...groups.entries()].sort((a, b) => b[1].length - a[1].length).forEach(([key, group]) => {
+    const all = shelves.filter((shelf) => shelf.gondola + "." + shelf.mod === key);
+    if (group.length === all.length) {
+      lines.push("Mod: " + key + " - " + group[0].plano, "   - disconnected mod!!", "");
+      return;
+    }
+    lines.push(group.length === 1 ? "Mod " + key + ":" : "Mod " + key + " (" + group.length + " shelves):");
+    group.sort((a, b) => a.shelf - b.shelf).forEach((shelf) => {
+      lines.push(" sn: " + shelf.hostname, "   name: " + shelf.name, "   planogram: " + shelf.plano);
+    });
+    lines.push("");
+  });
+  return lines.join("\n").trim() || "No disconnected shelves.";
+}
+
+function mesh(list) {
+  const x = [], y = [], z = [], ii = [], jj = [], kk = [], face = [], hover = [];
+  const faces = [[0,1,2],[0,2,3],[4,6,5],[4,7,6],[0,5,1],[0,4,5],[3,2,6],[3,6,7],[0,3,7],[0,7,4],[1,5,6],[1,6,2]];
+  list.forEach((shelf) => {
+    const x0 = shelf.x, x1 = shelf.x + shelf.w, y0 = shelf.y, y1 = shelf.y + shelf.d;
+    const z0 = shelf.z - shelf.h, z1 = shelf.z;
+    const base = x.length;
+    [x0,x1,x1,x0,x0,x1,x1,x0].forEach((v) => x.push(v));
+    [y0,y0,y1,y1,y0,y0,y1,y1].forEach((v) => y.push(v));
+    [z0,z0,z0,z0,z1,z1,z1,z1].forEach((v) => z.push(v));
+    const text = shelf.name + "  " + shelf.part + "  AP " + (shelf.ap || "disconnected") + "  RSSI " + shelf.rssi + "  SNR " + shelf.snr;
+    for (let v = 0; v < 8; v++) hover.push(text);
+    faces.forEach(([a, b, c]) => {
+      ii.push(base + a); jj.push(base + b); kk.push(base + c); face.push(shelfColor(shelf));
+    });
+  });
+  return {
+    type: "mesh3d", x, y, z, i: ii, j: jj, k: kk, facecolor: face,
+    hovertext: hover, hoverinfo: "text", flatshading: true, opacity: 0.85, name: "Shelves",
+  };
+}
+
+let shown = [];
+function draw() {
+  const apLabel = (ap) => ap === 0 ? "Disconnected" : String(ap);
+  const chLabel = (ch) => ch === 0 ? "Disconnected" : String(ch);
+  chips("pn-box", PARTS, state.parts, (v) => v);
+  chips("ap-box", APS.concat([0]), state.aps, apLabel);
+  chips("ch-box", CHANNELS.concat([0]), state.channels, chLabel);
+  const list = visibleShelves();
+  shown = list;
+  document.getElementById("disconnected").value = disconnectedText(list);
+  const data = [mesh(list)];
+  if (state.borders) {
+    data.push({
+      type: "scatter3d", mode: "lines",
+      x: OUTLINE.map((p) => p[0]), y: OUTLINE.map((p) => p[1]), z: OUTLINE.map(() => 0),
+      line: { color: "#334155", width: 4 }, hoverinfo: "skip", name: "Out borders",
+    });
+  }
+  const axis = { backgroundcolor: "#f6f7f9", gridcolor: "#e6ebf1", showbackground: true, color: "#64748b" };
+  const plotted = Plotly.react("plot", data, {
+    margin: { l: 0, r: 0, t: 0, b: 0 }, paper_bgcolor: "rgba(0,0,0,0)",
+    scene: {
+      bgcolor: "#f6f7f9",
+      xaxis: Object.assign({ title: "X" }, axis),
+      yaxis: Object.assign({ title: "Y" }, axis),
+      zaxis: Object.assign({ title: "Z" }, axis),
+      aspectmode: "manual",
+      aspectratio: { x: 1.6, y: 1.15, z: 0.22 },
+      camera: { eye: { x: 1.35, y: 1.45, z: 0.85 } },
+    },
+    showlegend: false,
+  }, { displaylogo: false, responsive: true });
+  if (!draw.bound) {
+    draw.bound = true;
+    plotted.then(() => document.getElementById("plot").on("plotly_click", (event) => {
+    const shelf = shown[Math.floor(event.points[0].pointNumber / 8)];
+    if (!shelf) return;
+    document.getElementById("selected").value = [
+      "sn: " + shelf.hostname,
+      "name: " + shelf.name,
+      "planogram: " + shelf.plano,
+      "part: " + shelf.part,
+      "ap: " + (shelf.ap || "disconnected"),
+      "channel: " + (shelf.channel || "disconnected"),
+      "rssi: " + shelf.rssi,
+      "snr: " + shelf.snr,
+    ].join("\n");
+    }));
+  }
+}
+
+function bindRange(minId, maxId, key) {
+  const minEl = document.getElementById(minId);
+  const maxEl = document.getElementById(maxId);
+  const sync = () => {
+    let lo = Number(minEl.value), hi = Number(maxEl.value);
+    if (lo > hi) { minEl.value = String(hi); maxEl.value = String(lo); lo = hi; hi = Number(maxEl.value); }
+    state[key] = [lo, hi];
+    draw();
+  };
+  minEl.addEventListener("input", sync);
+  maxEl.addEventListener("input", sync);
+}
+
+ticks("rssi-ticks", -100, 0, 10);
+ticks("snr-ticks", 0, 70, 10);
+bindRange("rssi-min", "rssi-max", "rssi");
+bindRange("snr-min", "snr-max", "snr");
+document.getElementById("find").addEventListener("input", (event) => { state.query = event.target.value; draw(); });
+document.getElementById("color-by").addEventListener("change", (event) => { state.color = event.target.value; draw(); });
+document.getElementById("borders").addEventListener("change", (event) => { state.borders = event.target.checked; draw(); });
+document.getElementById("download").addEventListener("click", () => {
+  const blob = new Blob([document.getElementById("disconnected").value], { type: "text/plain" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "disconnected-sample.txt";
+  link.click();
+});
+draw();
+</script>
+</body>
+</html>
