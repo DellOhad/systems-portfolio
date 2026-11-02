@@ -1,6 +1,5 @@
-import { useState } from 'react'
+import { useState, type MouseEvent } from 'react'
 import './App.css'
-import interactionExplorer from './work/interaction-explorer.png'
 import remoteConfiguration from './work/remote-configuration.png'
 import remoteConfigurationFlow from './work/remote-configuration-flow.png'
 import remoteConfigurationUi from './work/remote-configuration-ui.png'
@@ -13,9 +12,23 @@ function scrollToSection(id: string) {
 
 function App() {
   const [configurationExpanded, setConfigurationExpanded] = useState(false)
+  const [expandedImage, setExpandedImage] = useState<{ src: string; alt: string; caption: string } | null>(null)
+
+  function openImage(event: MouseEvent<HTMLElement>) {
+    if (!(event.target instanceof HTMLImageElement)) return
+
+    const figure = event.target.closest('figure.personal-visual')
+    if (!figure) return
+
+    setExpandedImage({
+      src: event.target.currentSrc || event.target.src,
+      alt: event.target.alt,
+      caption: figure.querySelector('figcaption')?.textContent?.trim() ?? '',
+    })
+  }
 
   return (
-    <main>
+    <main onClick={openImage}>
       <section className="personal-hero" id="top">
         <nav className="personal-nav shell" aria-label="Primary navigation">
           <button className="personal-brand" onClick={() => scrollToSection('top')} aria-label="Back to top">
@@ -57,7 +70,7 @@ function App() {
         </div>
 
         <article className="personal-case personal-case-dark exploration-case">
-          <div className="shell personal-case-grid">
+          <div className="shell exploration-layout">
             <div>
               <p className="personal-case-number">02 / EXPLORATION</p>
               <h2>Making a difficult investigation easier to follow.</h2>
@@ -71,9 +84,12 @@ function App() {
               </p>
               <p className="personal-result"><strong>What changed:</strong> a long, fragmented investigation became a guided one.</p>
             </div>
-            <figure className="personal-visual">
-              <img src={interactionExplorer} alt="An investigation workspace showing an event timeline and signals." />
-              <figcaption>An approved example of the investigation workspace.</figcaption>
+            <figure className="exploration-demo">
+              <iframe
+                title="Synthetic investigation, from scattered exports to one case file"
+                src={`${import.meta.env.BASE_URL}case-file.html`}
+              />
+              <figcaption>Synthetic tables for one day. Choose a row, then visualize that visit.</figcaption>
             </figure>
           </div>
         </article>
@@ -199,6 +215,18 @@ function App() {
           </p>
         </div>
       </section>
+
+      {expandedImage && (
+        <div className="image-lightbox" role="dialog" aria-modal="true" aria-label={expandedImage.alt} onClick={() => setExpandedImage(null)}>
+          <div className="image-lightbox-content" onClick={(event) => event.stopPropagation()}>
+            <button className="image-lightbox-close" onClick={() => setExpandedImage(null)} aria-label="Close enlarged image">
+              Close ×
+            </button>
+            <img src={expandedImage.src} alt={expandedImage.alt} />
+            {expandedImage.caption && <p>{expandedImage.caption}</p>}
+          </div>
+        </div>
+      )}
     </main>
   )
 }
