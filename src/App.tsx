@@ -137,25 +137,26 @@ function App() {
               </div>
               <div className="configuration-analysis">
                 <div>
-                  <p className="personal-case-number">TESTING THE SETTINGS</p>
-                  <h3>Check changes against real signal behavior.</h3>
+                  <p className="personal-case-number">CLOSING THE LOOP</p>
+                  <h3>From a setting change to what happens in the field.</h3>
                   <p>
-                    I built analysis tools to compare outcomes before and after a change, inspect
-                    raw device signals, and explore which parameter combinations work best.
+                    After a configuration change, I compared real device behavior before and after
+                    deployment. When the result needed improvement, I could inspect the underlying
+                    signals and test parameter combinations to find a better setting.
                   </p>
                 </div>
                 <div className="configuration-analysis-images">
                   <figure className="personal-visual">
                     <img src={configurationDurationAnalysis} alt="A before-and-after comparison of event durations." />
-                    <figcaption>Comparing event behavior before and after a configuration change.</figcaption>
+                    <figcaption>Measuring how a configuration change affected real event behavior.</figcaption>
                   </figure>
                   <figure className="personal-visual">
                     <img src={configurationSignalAnalysis} alt="Raw sensing hardware signals being inspected around an event." />
-                    <figcaption>Inspecting raw signals around a difficult event.</figcaption>
+                    <figcaption>Inspecting real hardware signals behind an unexpected result.</figcaption>
                   </figure>
                   <figure className="personal-visual">
                     <img src={configurationParameterMap} alt="A parameter map used to identify effective configuration ranges." />
-                    <figcaption>Exploring parameter ranges instead of tuning by guesswork.</figcaption>
+                    <figcaption>Testing parameter ranges to find a setting that performs well.</figcaption>
                   </figure>
                 </div>
               </div>
