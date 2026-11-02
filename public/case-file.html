@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Visualize a visit</title>
+<style>
+  :root { --ink: #1c1917; --muted: #78716c; --line: #e7e5e4; --paper: #f6f4ef; --hit: #f3e7c3; --red: #ff4b4b; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.4 "Source Sans 3", "Segoe UI", sans-serif; }
+  .wrap { width: min(1080px, calc(100% - 28px)); margin: 18px auto 24px; }
+  .top { display: flex; justify-content: space-between; gap: 16px; align-items: end; }
+  h1 { margin: 0; font-size: 22px; font-weight: 650; letter-spacing: -0.03em; }
+  .lede { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+  .tables { display: grid; grid-template-columns: 1.15fr 1.15fr 0.9fr; gap: 12px; margin-top: 16px; }
+  .sheet { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 8px 8px 4px; min-width: 0; }
+  .filehead { display: flex; justify-content: space-between; margin-bottom: 6px; color: var(--muted); font: 11px/1.3 ui-monospace, monospace; }
+  .scroller { max-height: 280px; overflow: auto; }
+  table { width: 100%; border-collapse: collapse; font: 11px/1.35 ui-monospace, monospace; }
+  th { position: sticky; top: 0; text-align: left; background: white; color: #a8a29e; font-weight: 500; padding: 4px 6px; }
+  td { padding: 4px 6px; border-top: 1px solid #f5f5f4; white-space: nowrap; }
+  tr.row { cursor: pointer; }
+  tr.hit td { background: var(--hit); }
+  .action { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 14px; }
+  .nudge { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--ink); font-size: 13px; white-space: nowrap; }
+  .arrow { width: 46px; height: 16px; flex: none; animation: point 0.9s ease-in-out infinite; }
+  @keyframes point {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(8px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .arrow { animation: none; }
+  }
+  button.viz, button.back { border: 0; background: var(--ink); color: white; border-radius: 8px; padding: 10px 16px; font: inherit; font-weight: 650; cursor: pointer; }
+  button.back { background: transparent; color: var(--ink); border: 1px solid #d6d3d1; }
+  button.viz:disabled { opacity: 0.4; cursor: default; }
+  .hidden { display: none; }
+  body.part-tables { background: transparent; }
+  body.part-tables .wrap { width: calc(100% - 8px); margin: 4px auto 8px; }
+  body.part-tables .tables { grid-template-columns: 1fr; gap: 8px; margin-top: 0; }
+  body.part-tables .scroller { max-height: 132px; }
+  body.part-tables tr.row { cursor: default; }
+  body.part-tables .top { display: none; }
+  body.exploring { background: #fff; }
+  .ix h2 { margin: 0 0 4px; font-size: 28px; font-weight: 700; letter-spacing: -0.03em; }
+  .modes { display: flex; gap: 8px; margin: 14px 0; flex-wrap: wrap; }
+  .modes span { border: 1px solid #d7dce3; border-radius: 8px; padding: 6px 10px; font-size: 13px; color: #31333f; background: #fff; }
+  .modes span.on { border-color: #ff4b4b; color: #ff4b4b; }
+  .summary { display: grid; grid-template-columns: 210px minmax(0, 1fr) 168px; gap: 12px; align-items: center; }
+  .meta label { display: block; color: #808495; font-size: 12px; margin-top: 8px; }
+  .meta code { display: block; font: 13px/1.35 ui-monospace, monospace; word-break: break-all; }
+  .metric { margin-top: 10px; }
+  .metric span { display: block; color: #808495; font-size: 14px; }
+  .metric strong { display: block; font-size: 28px; font-weight: 600; line-height: 1.1; }
+  .video { margin-top: 12px; border: 1px solid #d7dce3; background: #fff; border-radius: 8px; padding: 6px 12px; font: inherit; }
+  .pie { width: 100%; height: 280px; }
+  .pills { display: flex; flex-direction: column; gap: 8px; }
+  .pills p { margin: 0 0 4px; font-weight: 700; }
+  .pills button { border: 1px solid #d7dce3; background: #fff; border-radius: 8px; min-height: 40px; font: 13px/1.2 Verdana, Geneva, sans-serif; cursor: pointer; }
+  .pills button.on { background: var(--red); border-color: var(--red); color: white; }
+  .card { margin-top: 18px; border: 1px solid #e6e9ef; border-radius: 8px; padding: 8px 16px 16px; }
+  .fold { color: #31333f; font-size: 14px; padding: 8px 0; }
+  .card h3 { margin: 4px 0; font-size: 22px; }
+  .cap { margin: 0 0 8px; color: #808495; font-size: 13px; }
+  .legend { display: flex; justify-content: flex-end; gap: 14px; color: #31333f; font-size: 12px; }
+  .swatch { display: inline-block; width: 10px; height: 10px; margin-right: 4px; vertical-align: -1px; }
+  .chart { width: 100%; height: auto; }
+  .pager { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 8px 0; }
+  .pager button { border: 1px solid #d7dce3; background: #fff; border-radius: 8px; padding: 6px 10px; font: inherit; cursor: pointer; }
+  .pager button:disabled { opacity: 0.4; cursor: default; }
+  .facts-line { display: flex; justify-content: space-between; gap: 8px; color: #31333f; font-size: 13px; margin-bottom: 8px; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .score-row { display: grid; grid-template-columns: minmax(0, 1.4fr) 48px minmax(70px, 1fr); gap: 8px; align-items: center; margin: 5px 0; font-size: 12px; }
+  .score-row i { display: block; height: 14px; background: #1d4ed8; border-radius: 2px; }
+  .score-row b { font-weight: 500; color: #475569; }
+  .weight { width: 100%; height: 220px; background: #1e293b; border-radius: 6px; }
+  .counts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 8px; }
+  .counts div { background: #f8fafc; border-radius: 8px; padding: 8px; }
+  .counts strong { display: block; font-size: 22px; }
+  .counts span, .small { color: #64748b; font-size: 12px; }
+  .curves { width: 100%; height: 180px; }
+  .fold { width: 100%; text-align: left; border: 0; background: transparent; cursor: pointer; padding: 8px 0; font: inherit; }
+  .check { font-size: 13px; color: #31333f; }
+  .basket, .weight, .map, .countplot { width: 100%; height: auto; }
+  h4 { margin: 14px 0 6px; font-size: 16px; }
+  .count-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 8px 0 10px; }
+  .count-cards div { background: #faf7f2; border-radius: 10px; padding: 8px 10px; }
+  .count-cards strong { display: block; font-size: 22px; font-weight: 650; letter-spacing: -0.03em; }
+  .count-cards span { color: #78716c; font-size: 12px; }
+  .count-cards .win { box-shadow: inset 0 -3px 0 #0f766e; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1 id="title">Records · 12 Mar 2026</h1>
+      <p class="lede" id="lede">Measured shelf signals. Names are replaced.</p>
+    </div>
+    <button class="back hidden" id="back" type="button">Back to tables</button>
+  </div>
+  <div id="tables">
+    <div class="tables">
+      <section class="sheet"><div class="filehead"><span>events.csv</span><span>date, time, location</span></div><div class="scroller" id="events"></div></section>
+      <section class="sheet"><div class="filehead"><span>signals.csv</span><span>date, channel, samples</span></div><div class="scroller" id="signals"></div></section>
+      <section class="sheet"><div class="filehead"><span>people.csv</span><span>date, person, window</span></div><div class="scroller" id="people"></div></section>
+    </div>
+    <div class="action">
+      <p class="nudge">Confusing? Push here <svg class="arrow" viewBox="0 0 52 16" aria-hidden="true"><line x1="1" y1="8" x2="36" y2="8" stroke="currentColor" stroke-width="1.75"></line><polyline points="28,2.5 46,8 28,13.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter"></polyline></svg></p>
+      <button class="viz" id="viz" type="button">Visualize it</button>
+    </div>
+  </div>
+  <div id="view" class="hidden"></div>
+</div>
+<script>
+const PIE = ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f"];
+let visits = [];
+let selected = null;
+let reading = 0;
+let eventIndex = 0;
+let whyOpen = false;
+let shelfOpen = false;
+let showAll = true;
+
+function esc(value) {
+  return String(value).replace(/[&<>]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[ch]));
+}
+const part = new URLSearchParams(location.search).get("part") || "tables";
+document.body.classList.add("part-" + part);
+function reportHeight() {
+  requestAnimationFrame(() => {
+    parent.postMessage({ type: "case-file-height", part: part, height: document.documentElement.scrollHeight }, "*");
+  });
+}
+function sheetTable(headers, rows) {
+  const head = "<tr>" + headers.map((h) => "<th>" + h + "</th>").join("") + "</tr>";
+  const body = rows.map((row) => {
+    const cls = row.id && row.id === selected ? "hit" : "";
+    const attr = row.id ? " data-id=\"" + row.id + "\"" : "";
+    return "<tr class=\"row " + cls + "\"" + attr + ">" + row.cells.map((cell) => "<td>" + esc(cell) + "</td>").join("") + "</tr>";
+  }).join("");
+  return "<table>" + head + body + "</table>";
+}
+function chosenIndex(item) {
+  const index = item.interpretations.findIndex((entry) => entry.chosen);
+  return index < 0 ? 0 : index;
+}
+function timeRange(item) {
+  let t0 = 0;
+  let t1 = 1;
+  item.shelves.forEach((shelf) => {
+    t0 = Math.min(t0, shelf.t[0]);
+    t1 = Math.max(t1, shelf.t[shelf.t.length - 1]);
+  });
+  item.interpretations.forEach((option) => option.events.forEach((event) => {
+    t0 = Math.min(t0, event.start);
+    t1 = Math.max(t1, event.end);
+  }));
+  return [t0, t1 + 0.2];
+}
+function signalAmp(shelves) {
+  let max = 1;
+  shelves.forEach((shelf) => shelf.v.forEach((value) => { max = Math.max(max, Math.abs(value)); }));
+  return max;
+}
+function pathFor(shelf, t0, t1, left, width, mid, amp) {
+  let d = "";
+  for (let i = 0; i < shelf.t.length; i++) {
+    const t = shelf.t[i];
+    if (t < t0 || t > t1) continue;
+    const x = left + ((t - t0) / (t1 - t0)) * width;
+    const y = mid - (shelf.v[i] / amp) * 22;
+    d += (d ? "L" : "M") + x.toFixed(1) + " " + y.toFixed(1);
+  }
+  return d;
+}
+function storyVisit() {
+  return visits[0];
+}
+function renderTables() {
+  const visit = storyVisit();
+  const events = [];
+  const signals = [];
+  visit.interpretations.forEach((option) => {
+    option.events.forEach((event) => {
+      events.push({ cells: [visit.date, event.t, event.shelf, event.weight, event.action] });
+    });
+  });
+  visit.shelves.forEach((shelf) => {
+    const step = Math.max(1, Math.floor(shelf.t.length / 6));
+    for (let i = 0; i < shelf.t.length; i += step) {
+      signals.push({ cells: [visit.date, shelf.t[i].toFixed(2), shelf.name, shelf.v[i]] });
+    }
+  });
+  events.sort((a, b) => String(a.cells[1]).localeCompare(String(b.cells[1])));
+  document.getElementById("events").innerHTML = sheetTable(["date", "time", "shelf", "grams", "dir"], events);
+  document.getElementById("signals").innerHTML = sheetTable(["date", "sec", "shelf", "signal"], signals);
+  document.getElementById("people").innerHTML = sheetTable(["date", "person", "start", "area"], [{ cells: [visit.date, visit.person, visit.time, visit.place] }]);
+  reportHeight();
+}
+function pieSvg(item) {
+  const cx = 150, cy = 140, base = 112;
+  let angle = -Math.PI / 2;
+  const total = item.interpretations.reduce((sum, entry) => sum + entry.share, 0) || 1;
+  const parts = item.interpretations.map((entry, index) => {
+    const frac = entry.share / total;
+    const a0 = angle;
+    const a1 = angle + frac * Math.PI * 2;
+    angle = a1;
+    const radius = index === reading ? base + 8 : base;
+    const x0 = cx + radius * Math.cos(a0), y0 = cy + radius * Math.sin(a0);
+    const x1 = cx + radius * Math.cos(a1), y1 = cy + radius * Math.sin(a1);
+    const large = a1 - a0 > Math.PI ? 1 : 0;
+    const mid = (a0 + a1) / 2;
+    const lx = cx + radius * 0.62 * Math.cos(mid), ly = cy + radius * 0.62 * Math.sin(mid);
+    const label = "R" + (index + 1) + (entry.chosen || (item.interpretations.every((option) => !option.chosen) && index === 0) ? " ★" : "");
+    return "<path data-reading=\"" + index + "\" d=\"M " + cx + " " + cy + " L " + x0.toFixed(1) + " " + y0.toFixed(1) + " A " + radius + " " + radius + " 0 " + large + " 1 " + x1.toFixed(1) + " " + y1.toFixed(1) + " Z\" fill=\"" + PIE[index % PIE.length] + "\" stroke=\"#fff\" stroke-width=\"2\"></path>" +
+      "<text pointer-events=\"none\" x=\"" + lx.toFixed(1) + "\" y=\"" + ly.toFixed(1) + "\" text-anchor=\"middle\" dominant-baseline=\"middle\" fill=\"#fff\" font-size=\"13\" font-family=\"Verdana, Geneva, sans-serif\">" + label + "</text>";
+  }).join("");
+  return "<svg class=\"pie\" viewBox=\"0 0 300 280\">" + parts + "</svg>";
+}
+function chartSvg(item) {
+  const shelves = showAll ? item.shelves : item.shelves.filter((shelf) => shelf.name === item.interpretations[reading].events[eventIndex].shelf);
+  const drawn = shelves.length ? shelves : item.shelves.slice(0, 1);
+  const chosen = item.interpretations[reading];
+  const [t0, t1] = timeRange(item);
+  const amp = signalAmp(drawn);
+  const left = 36, right = 16, top = 8, rowH = 64;
+  const width = 680, plotW = width - left - right;
+  const height = top + drawn.length * rowH + 16;
+  const rows = drawn.map((shelf, row) => {
+    const mid = top + row * rowH + rowH / 2;
+    const bars = chosen.events.map((event, index) => {
+      if (event.shelf !== shelf.name) return "";
+      const x = left + ((event.start - t0) / (t1 - t0)) * plotW;
+      const w = Math.max(18, ((event.end - event.start) / (t1 - t0)) * plotW);
+      const color = event.action === "take" ? "#2563eb" : "#16a34a";
+      const edge = index === eventIndex ? " stroke=\"#111\" stroke-width=\"2\"" : "";
+      return "<rect data-event=\"" + index + "\" x=\"" + x.toFixed(1) + "\" y=\"" + (mid - 10) + "\" width=\"" + w.toFixed(1) + "\" height=\"20\" rx=\"2\" fill=\"" + color + "\" opacity=\"0.55\"" + edge + "></rect>";
+    }).join("");
+    return "<text x=\"4\" y=\"" + (mid + 4) + "\" font-size=\"11\" fill=\"#31333f\">" + shelf.name + "</text><path d=\"" + pathFor(shelf, t0, t1, left, plotW, mid, amp) + "\" fill=\"none\" stroke=\"#7c6bb5\" stroke-width=\"1.2\"/>" + bars;
+  }).join("");
+  return "<svg class=\"chart\" viewBox=\"0 0 " + width + " " + height + "\">" + rows + "</svg>";
+}
+function weightSvg(item, event) {
+  const shelf = item.shelves.find((entry) => entry.name === event.shelf) || item.shelves[0];
+  const t0 = event.start - 0.8;
+  const t1 = event.end + 0.8;
+  const pts = [];
+  for (let i = 0; i < shelf.t.length; i++) {
+    if (shelf.t[i] >= t0 && shelf.t[i] <= t1) pts.push([shelf.t[i], shelf.v[i]]);
+  }
+  if (pts.length < 2) return "<p class=\"small\">No shelf samples in this window.</p>";
+  const values = pts.map((point) => point[1]).concat([event.weight]);
+  const min = Math.min.apply(null, values);
+  const max = Math.max.apply(null, values);
+  const left = 36, top = 16, plotW = 600, plotH = 180;
+  const yOf = (value) => top + plotH - ((value - min) / (max - min || 1)) * plotH;
+  const d = pts.map((point, index) => {
+    const x = left + ((point[0] - t0) / (t1 - t0)) * plotW;
+    return (index ? "L" : "M") + x.toFixed(1) + " " + yOf(point[1]).toFixed(1);
+  }).join("");
+  const mark = yOf(event.weight);
+  return "<svg class=\"weight\" viewBox=\"0 0 660 220\"><rect width=\"660\" height=\"220\" rx=\"6\" fill=\"#f6f1e7\"></rect>" +
+    "<path d=\"" + d + "\" fill=\"none\" stroke=\"#57534e\" stroke-width=\"1.6\"></path>" +
+    "<line x1=\"" + left + "\" y1=\"" + mark.toFixed(1) + "\" x2=\"" + (left + plotW) + "\" y2=\"" + mark.toFixed(1) + "\" stroke=\"#9a3412\" stroke-dasharray=\"4 3\"></line>" +
+    "<text x=\"" + (left + 8) + "\" y=\"" + (mark - 6).toFixed(1) + "\" fill=\"#9a3412\" font-size=\"12\">event " + event.weight + " g</text></svg>";
+}
+function mapSvg(event) {
+  const map = event.map;
+  if (!map || !map.products.length) return "<p class=\"small\">No shelf map for this event.</p>";
+  const y0 = map.y0, y1 = map.y1;
+  const spans = map.products.flatMap((product) => product.x);
+  const x0 = Math.min.apply(null, spans.map((span) => span[0]));
+  const x1 = Math.max.apply(null, spans.map((span) => span[1]));
+  const left = 46, top = 58, plotW = 600, plotH = 230, width = 660, height = 320;
+  const X = (value) => left + ((value - x0) / (x1 - x0 || 1)) * plotW;
+  const Y = (value) => top + plotH - ((value - y0) / (y1 - y0 || 1)) * plotH;
+  let grid = "";
+  for (let i = 0; i <= 4; i++) {
+    const y = top + (plotH / 4) * i;
+    grid += "<line x1=\"" + left + "\" y1=\"" + y + "\" x2=\"" + (left + plotW) + "\" y2=\"" + y + "\" stroke=\"#e7dcc8\"></line>";
+  }
+  grid += "<line x1=\"" + left + "\" y1=\"" + Y(0).toFixed(1) + "\" x2=\"" + (left + plotW) + "\" y2=\"" + Y(0).toFixed(1) + "\" stroke=\"#a8a29e\"></line>";
+  const ordered = map.products.filter((product) => !product.on).concat(map.products.filter((product) => product.on));
+  const bands = ordered.map((product) => product.x.map((span) => {
+    const color = product.on ? "#0f766e" : "#d6c7b0";
+    const stroke = product.on ? 2.6 : 1.3;
+    const levels = product.levels.map((level) => "<line x1=\"" + X(span[0]).toFixed(1) + "\" y1=\"" + Y(level).toFixed(1) + "\" x2=\"" + X(span[1]).toFixed(1) + "\" y2=\"" + Y(level).toFixed(1) + "\" stroke=\"" + color + "\" stroke-width=\"" + stroke + "\"></line>").join("");
+    const edges = [span[0], span[1]].map((edge) => "<line x1=\"" + X(edge).toFixed(1) + "\" y1=\"" + top + "\" x2=\"" + X(edge).toFixed(1) + "\" y2=\"" + (top + plotH) + "\" stroke=\"" + (product.on ? "#99f6e4" : "#efe6d6") + "\"></line>").join("");
+    const mid = (span[0] + span[1]) / 2;
+    const pile = map.products.filter((other) => other.x.some((pair) => Math.abs((pair[0] + pair[1]) / 2 - mid) < 8)).indexOf(product);
+    const name = "<text x=\"" + X(mid).toFixed(1) + "\" y=\"" + (14 + Math.max(0, pile) * 12) + "\" text-anchor=\"middle\" font-size=\"11\" fill=\"" + (product.on ? "#0f766e" : "#78716c") + "\">" + esc(product.label) + "</text>";
+    return edges + levels + name;
+  }).join("")).join("");
+  let marker = "";
+  if (map.x != null) {
+    const cx = X(map.x), cy = Y(event.weight);
+    marker = "<polygon points=\"" + cx.toFixed(1) + "," + (cy - 7) + " " + (cx + 7).toFixed(1) + "," + cy.toFixed(1) + " " + cx.toFixed(1) + "," + (cy + 7) + " " + (cx - 7).toFixed(1) + "," + cy.toFixed(1) + "\" fill=\"#9a3412\"></polygon>" +
+      "<text x=\"" + (cx + 10).toFixed(1) + "\" y=\"" + (cy - 8).toFixed(1) + "\" fill=\"#9a3412\" font-size=\"12\">" + event.weight + " g</text>";
+  }
+  return "<svg class=\"map\" viewBox=\"0 0 " + width + " " + height + "\"><rect width=\"" + width + "\" height=\"" + height + "\" rx=\"8\" fill=\"#f6f1e7\"></rect>" + grid + bands + marker +
+    "<text x=\"" + left + "\" y=\"" + (height - 8) + "\" font-size=\"11\" fill=\"#a8a29e\">along the shelf</text><text x=\"8\" y=\"36\" font-size=\"11\" fill=\"#a8a29e\" transform=\"rotate(-90 8 36)\">grams</text></svg>";
+}
+function countBlock(event) {
+  const count = event.count;
+  if (!count) return "<p class=\"small\">This change is too small for a count curve.</p>";
+  const colors = ["#78716c", "#0f766e", "#c2410c", "#a16207"];
+  const cards = count.cards.map((card, index) => {
+    const win = card.tag === "both" || card.tag === "weight" || card.tag === "classifier";
+    return "<div class=\"" + (win ? "win" : "") + "\"><strong style=\"color:" + colors[index % colors.length] + "\">" + card.pct + "%</strong><span>count " + card.n + "</span></div>";
+  }).join("");
+  const left = 36, top = 16, plotW = 600, plotH = 170;
+  const x1 = count.x[count.x.length - 1] || 1;
+  const X = (value) => left + (value / x1) * plotW;
+  const Y = (value) => top + plotH - value * plotH;
+  const lines = count.cards.map((card, index) => {
+    const series = count.y[String(card.n)] || [];
+    const d = series.map((value, i) => (i ? "L" : "M") + X(count.x[i]).toFixed(1) + " " + Y(value).toFixed(1)).join("");
+    return "<path d=\"" + d + "\" fill=\"none\" stroke=\"" + colors[index % colors.length] + "\" stroke-width=\"" + (card.tag ? 2.6 : 1.5) + "\"></path>";
+  }).join("");
+  const mark = X(count.event);
+  const note = count.cards.some((card) => card.tag === "both")
+    ? "Count " + count.cards.find((card) => card.tag === "both").n + " is where the weight and the classifier agree."
+    : "The weight curve favors count " + (count.cards.find((card) => card.tag === "weight") || count.cards[0]).n + ".";
+  return "<div class=\"count-cards\">" + cards + "</div><svg class=\"countplot\" viewBox=\"0 0 660 210\"><rect width=\"660\" height=\"210\" rx=\"8\" fill=\"#fbfaf7\"></rect>" + lines +
+    "<line x1=\"" + mark.toFixed(1) + "\" y1=\"" + top + "\" x2=\"" + mark.toFixed(1) + "\" y2=\"" + (top + plotH) + "\" stroke=\"#1c1917\"></line>" +
+    "<text x=\"" + (mark + 6).toFixed(1) + "\" y=\"" + (top + 12) + "\" font-size=\"12\">" + count.event + " g</text></svg>" +
+    "<p class=\"small\">Per unit " + count.mu + " g, spread " + count.sigma + " g. " + note + "</p>";
+}
+function scoreRows(pairs) {
+  if (!pairs || !pairs.length) return "<p class=\"small\">No scores stored for this event.</p>";
+  const max = Math.max.apply(null, pairs.map((pair) => Math.abs(pair[1]))) || 1;
+  return pairs.map((pair) => "<div class=\"score-row\"><span>" + esc(pair[0]) + "</span><b>" + pair[1] + "</b><i style=\"width:" + Math.round(Math.abs(pair[1]) / max * 100) + "%\"></i></div>").join("");
+}
+function basketSvg(basket) {
+  const rows = basket.length ? basket : [{ name: "Not an item", qty: 1 }];
+  const width = 640, height = 190, max = Math.max(2, ...rows.map((item) => Math.abs(item.qty)));
+  const gap = width / rows.length;
+  const bars = rows.map((item, index) => {
+    const h = (Math.abs(item.qty) / max) * 110;
+    const x = gap * index + gap * 0.18;
+    const y = 130 - h;
+    const color = item.name === "Not an item" ? "#94a3b8" : "#2563eb";
+    return "<rect x=\"" + x.toFixed(1) + "\" y=\"" + y.toFixed(1) + "\" width=\"" + (gap * 0.64).toFixed(1) + "\" height=\"" + h.toFixed(1) + "\" fill=\"" + color + "\"></rect>" +
+      "<text x=\"" + (x + gap * 0.32).toFixed(1) + "\" y=\"" + (y - 6).toFixed(1) + "\" text-anchor=\"middle\" font-size=\"12\">" + item.qty + "</text>" +
+      "<text x=\"" + (x + gap * 0.32).toFixed(1) + "\" y=\"160\" text-anchor=\"middle\" font-size=\"11\" fill=\"#475569\">" + esc(item.name) + "</text>";
+  }).join("");
+  return "<svg class=\"basket\" viewBox=\"0 0 " + width + " " + height + "\">" + bars + "</svg>";
+}
+function whyText(option) {
+  const picks = option.events.filter((event) => event.action === "take").length;
+  const backs = option.events.length - picks;
+  const biggest = option.events.slice().sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight))[0];
+  return picks + " picks and " + backs + " put-backs. Largest change is " + biggest.weight + " g on " + biggest.shelf + ".";
+}
+function renderExplorer() {
+  const item = storyVisit();
+  selected = item.id;
+  const option = item.interpretations[reading];
+  if (eventIndex >= option.events.length) eventIndex = 0;
+  const current = option.events[eventIndex];
+  const pills = item.interpretations.map((entry, index) => {
+    const star = entry.chosen || (item.interpretations.every((option) => !option.chosen) && index === 0) ? " ★" : "";
+    return "<button type=\"button\" data-reading=\"" + index + "\" class=\"" + (index === reading ? "on" : "") + "\">R" + (index + 1) + star + " (" + entry.share + "%)</button>";
+  }).join("");
+  document.getElementById("view").innerHTML =
+    "<div class=\"ix\"><h2>Visit review</h2><div class=\"modes\"><span class=\"on\">One visit</span><span>By person</span><span>By shelf</span><span>Compare runs</span><span>Basket check</span></div>" +
+    "<div class=\"summary\"><div class=\"meta\"><label>Visit</label><code>" + esc(item.code) + "</code><label>Person</label><code>" + esc(item.personCode) + "</code><div class=\"metric\"><span>Site</span><strong>" + esc(item.site) + "</strong></div><div class=\"metric\"><span>Date</span><strong>" + esc(item.date) + "</strong></div><div class=\"metric\"><span>Readings</span><strong>" + item.interpretations.length + "</strong></div><button class=\"video\" type=\"button\">Clip</button></div>" +
+    pieSvg(item) +
+    "<div class=\"pills\"><p>Reading</p>" + pills + "</div></div>" +
+    "<section class=\"card\"><h3>Event timeline</h3><p class=\"cap\">The line is the measured shelf signal, with the first sample removed. Click a bar to inspect that event. R" + (reading + 1) + " is accentuated.</p><div class=\"legend\"><span><i class=\"swatch\" style=\"background:#7c6bb5\"></i>signal</span><span><i class=\"swatch\" style=\"background:#2563eb\"></i>pick</span><span><i class=\"swatch\" style=\"background:#16a34a\"></i>put back</span></div><label class=\"check\"><input id=\"all-shelves\" type=\"checkbox\"" + (showAll ? " checked" : "") + "> Show every shelf</label>" +
+    chartSvg(item) + "</section>" +
+    "<section class=\"card\"><h3>Classified basket</h3>" + basketSvg(option.basket) + "</section>" +
+    "<section class=\"card\"><button class=\"fold\" type=\"button\" data-toggle=\"why\">" + (whyOpen ? "▾" : "▸") + " Why this reading?</button>" + (whyOpen ? "<p>" + esc(whyText(option)) + "</p>" : "") + "</section>" +
+    "<section class=\"card\"><h3>Item check</h3><div class=\"pager\"><button type=\"button\" data-nav=\"prev\"" + (eventIndex === 0 ? " disabled" : "") + ">Previous event</button><span>Event " + (eventIndex + 1) + " / " + option.events.length + "</span><button type=\"button\" data-nav=\"next\"" + (eventIndex === option.events.length - 1 ? " disabled" : "") + ">Next event</button></div>" +
+    "<div class=\"facts-line\"><span>" + esc(current.t) + "</span><span>" + (current.action === "take" ? "Pick" : "Put back") + "</span><span>Shelf " + esc(current.shelf) + "</span><span>" + current.weight + " g</span>" + (current.qty ? "<span>" + current.qty + " units</span>" : "") + "</div>" +
+    "<h4>Where it sits</h4>" + mapSvg(current) +
+    "<h4>How many</h4>" + countBlock(current) +
+    "<h4>Signal around the event</h4>" + weightSvg(item, current) +
+    "<div class=\"split\"><div><h4>Camera scores</h4>" + scoreRows(current.raw) + "</div><div><h4>Combined scores</h4>" + scoreRows(current.ensemble) + "</div></div>" +
+    "<p class=\"small\">Not-an-item score " + current.notItem + ". Teal bands are the item under this event. The rust mark is the measured weight.</p></section>" +
+    "<section class=\"card\"><button class=\"fold\" type=\"button\" data-toggle=\"shelf\">" + (shelfOpen ? "▾" : "▸") + " Shelf event details</button>" +
+    (shelfOpen ? "<p class=\"small\">" + option.events.map((entry, index) => (index === eventIndex ? "Selected: " : "") + entry.t + " · " + entry.shelf + " · " + (entry.action === "take" ? "pick" : "put back") + " · " + entry.weight + " g").join("<br>") + "</p>" : "") +
+    "</section></div>";
+  reportHeight();
+}
+function show(mode) {
+  const explorer = mode === "explorer";
+  document.body.classList.toggle("exploring", explorer);
+  document.getElementById("tables").classList.toggle("hidden", explorer);
+  document.getElementById("view").classList.toggle("hidden", !explorer);
+  document.getElementById("back").classList.toggle("hidden", !explorer);
+  document.getElementById("title").classList.toggle("hidden", explorer);
+  document.getElementById("lede").classList.toggle("hidden", explorer);
+  if (explorer) renderExplorer();
+  else reportHeight();
+}
+document.getElementById("view").addEventListener("click", (event) => {
+  const readingNode = event.target.closest("[data-reading]");
+  if (readingNode) {
+    reading = Number(readingNode.getAttribute("data-reading"));
+    eventIndex = 0;
+    renderExplorer();
+    return;
+  }
+  const eventNode = event.target.closest("[data-event]");
+  if (eventNode) {
+    eventIndex = Number(eventNode.getAttribute("data-event"));
+    renderExplorer();
+    return;
+  }
+  const nav = event.target.closest("[data-nav]");
+  if (nav && !nav.disabled) {
+    const total = visits.find((entry) => entry.id === selected).interpretations[reading].events.length;
+    eventIndex = nav.getAttribute("data-nav") === "prev" ? Math.max(0, eventIndex - 1) : Math.min(total - 1, eventIndex + 1);
+    renderExplorer();
+    return;
+  }
+  const toggle = event.target.closest("[data-toggle]");
+  if (!toggle) return;
+  if (toggle.getAttribute("data-toggle") === "why") whyOpen = !whyOpen;
+  else shelfOpen = !shelfOpen;
+  renderExplorer();
+});
+document.getElementById("view").addEventListener("change", (event) => {
+  if (event.target.id !== "all-shelves") return;
+  showAll = event.target.checked;
+  renderExplorer();
+});
+document.getElementById("viz").addEventListener("click", () => {
+  parent.postMessage({ type: "case-file-open" }, "*");
+});
+document.getElementById("back").addEventListener("click", () => {
+  parent.postMessage({ type: "case-file-close" }, "*");
+});
+fetch("visits.json").then((response) => response.json()).then((data) => {
+  visits = data.visits;
+  visits.forEach((visit) => { visit.interpretations = visit.readings; });
+  if (part === "explorer") {
+    reading = chosenIndex(storyVisit());
+    document.getElementById("tables").classList.add("hidden");
+    document.getElementById("view").classList.remove("hidden");
+    document.getElementById("title").classList.add("hidden");
+    document.getElementById("lede").classList.add("hidden");
+    document.getElementById("back").classList.remove("hidden");
+    document.getElementById("back").textContent = "Close";
+    document.body.classList.add("exploring");
+    renderExplorer();
+  } else {
+    document.getElementById("view").classList.add("hidden");
+    renderTables();
+  }
+}).catch(() => {
+  document.getElementById("lede").textContent = "Could not load the visit file.";
+});
+</script>
+</body>
+</html>
