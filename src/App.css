@@ -1313,6 +1313,14 @@
   grid-row: 1;
 }
 
+.configuration-case > .personal-case-grid {
+  grid-template-columns: minmax(260px, 0.65fr) minmax(0, 1.35fr);
+}
+
+.configuration-case > .personal-case-grid > .personal-visual img {
+  max-height: 560px;
+}
+
 .personal-case h2 {
   max-width: 520px;
   margin-top: 18px;
@@ -1439,7 +1447,7 @@
 }
 
 .configuration-detail-images .personal-visual img {
-  max-height: 320px;
+  max-height: 250px;
 }
 
 .configuration-analysis {
