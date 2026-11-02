@@ -1441,13 +1441,17 @@
 
 .configuration-detail-images {
   display: grid;
-  grid-template-columns: 1.18fr 0.82fr;
+  grid-template-columns: 1.3fr 0.7fr;
   gap: 16px;
   align-items: start;
 }
 
 .configuration-detail-images .personal-visual img {
   max-height: 250px;
+}
+
+.configuration-detail-images .personal-visual:first-child img {
+  max-height: 330px;
 }
 
 .configuration-analysis {

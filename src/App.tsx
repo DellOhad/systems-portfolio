@@ -125,13 +125,13 @@ function App() {
                 </p>
               </div>
               <div className="configuration-detail-images">
-                <figure className="personal-visual">
-                  <img src={remoteConfigurationUi} alt="Interface screens for setting device configuration values." />
-                  <figcaption>The interface for defining defaults and targeted overrides.</figcaption>
-                </figure>
                 <figure className="personal-visual personal-visual-light">
                   <img src={remoteConfiguration} alt="A hand-drawn sketch of device-side configuration and syncing." />
                   <figcaption>An early device-side configuration and sync design.</figcaption>
+                </figure>
+                <figure className="personal-visual">
+                  <img src={remoteConfigurationUi} alt="Interface screens for setting device configuration values." />
+                  <figcaption>The interface for defining defaults and targeted overrides.</figcaption>
                 </figure>
               </div>
               <div className="configuration-analysis">
