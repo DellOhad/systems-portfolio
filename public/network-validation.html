@@ -291,7 +291,11 @@ for (const [gondola, x0, y0, n] of runs) {
       const x = vertical ? x0 : x0 + (m - 1) * 180;
       const y = vertical ? y0 + (m - 1) * 180 : y0;
       const area = areaAccessPoint(x, y);
-      if (!dead) { shelfAp = area.ap; shelfCh = area.channel; }
+      if (!dead) {
+        // Keep the localized weak-SNR group on one access point to make the shared cause visible.
+        shelfAp = weak ? 6 : area.ap;
+        shelfCh = weak ? CHANNELS[6 % CHANNELS.length] : area.channel;
+      }
       shelves.push({
         hostname: "DEMO-" + String(serial++).padStart(4, "0"),
         part, plano, gondola, mod: m, shelf: s,
