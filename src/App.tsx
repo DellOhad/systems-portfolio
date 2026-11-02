@@ -1,4 +1,4 @@
-import { useState, type MouseEvent } from 'react'
+import { useEffect, useState, type MouseEvent } from 'react'
 import './App.css'
 import remoteConfiguration from './work/remote-configuration.png'
 import remoteConfigurationFlow from './work/remote-configuration-flow.png'
@@ -13,6 +13,29 @@ function scrollToSection(id: string) {
 function App() {
   const [configurationExpanded, setConfigurationExpanded] = useState(false)
   const [expandedImage, setExpandedImage] = useState<{ src: string; alt: string; caption: string } | null>(null)
+  const [storyOpen, setStoryOpen] = useState(false)
+  const [tablesHeight, setTablesHeight] = useState(460)
+  const [explorerHeight, setExplorerHeight] = useState(720)
+
+  useEffect(() => {
+    const onMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return
+      if (event.data?.type === 'case-file-open') {
+        setStoryOpen(true)
+        return
+      }
+      if (event.data?.type === 'case-file-close') {
+        setStoryOpen(false)
+        return
+      }
+      const height = Number(event.data?.type === 'case-file-height' ? event.data.height : NaN)
+      if (height <= 180 || height >= 5000) return
+      if (event.data.part === 'explorer') setExplorerHeight(height + 8)
+      if (event.data.part === 'tables') setTablesHeight(height + 8)
+    }
+    window.addEventListener('message', onMessage)
+    return () => window.removeEventListener('message', onMessage)
+  }, [])
 
   function openImage(event: MouseEvent<HTMLElement>) {
     if (!(event.target instanceof HTMLImageElement)) return
@@ -84,13 +107,22 @@ function App() {
               </p>
               <p className="personal-result"><strong>What changed:</strong> a long, fragmented investigation became a guided one.</p>
             </div>
-            <figure className="exploration-demo">
+            <figure className="exploration-demo exploration-tables">
               <iframe
-                title="Synthetic investigation, from scattered exports to one case file"
-                src={`${import.meta.env.BASE_URL}case-file.html`}
+                title="Files for one visit"
+                src={`${import.meta.env.BASE_URL}case-file.html?part=tables`}
+                style={{ height: tablesHeight }}
               />
-              <figcaption>Synthetic tables for one day. Choose a row, then visualize that visit.</figcaption>
             </figure>
+            {storyOpen ? (
+              <figure className="exploration-demo exploration-stage">
+                <iframe
+                  title="Visit review"
+                  src={`${import.meta.env.BASE_URL}case-file.html?part=explorer`}
+                  style={{ height: explorerHeight }}
+                />
+              </figure>
+            ) : null}
           </div>
         </article>
 
@@ -98,16 +130,17 @@ function App() {
           <div className="shell personal-case-grid reverse">
             <div>
               <p className="personal-case-number">01 / CONFIGURATION</p>
-              <h2>A simpler way to tune devices in the field.</h2>
+              <h2>Changing device behavior should not require a new release.</h2>
+              <p className="personal-subheading">THE PROBLEM</p>
               <p>
-                A change in how a device interprets its sensor signal used to require preparing
-                and releasing new firmware. I built the complete path for making those changes
-                remotely instead.
+                Even a small adjustment to how a deployed device interprets sensor data meant
+                preparing, releasing, and deploying new firmware.
               </p>
+              <p className="personal-subheading">HIGH-LEVEL SOLUTION</p>
               <p>
-                The work connected an operations interface, backend configuration rules, and
-                embedded firmware. Teams can set sensible defaults, make targeted overrides where
-                needed, and see which settings a device is using.
+                I separated configuration from firmware. Teams can set defaults or targeted
+                overrides, while the backend delivers the right setting to each device during its
+                normal sync.
               </p>
               <p className="personal-result"><strong>What changed:</strong> device behavior can be adjusted remotely without a firmware release.</p>
               <button
@@ -116,7 +149,7 @@ function App() {
                 aria-expanded={configurationExpanded}
                 aria-controls="configuration-details"
               >
-                {configurationExpanded ? 'Hide implementation details' : 'See how it works'} <span>{configurationExpanded ? '↑' : '↓'}</span>
+                {configurationExpanded ? 'Hide implementation details' : 'How it works'} <span>{configurationExpanded ? '↑' : '↓'}</span>
               </button>
             </div>
             <figure className="personal-visual">

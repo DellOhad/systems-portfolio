@@ -1255,26 +1255,39 @@
 }
 
 .exploration-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 42px;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(280px, 1.1fr);
+  gap: 28px 40px;
+  align-items: start;
 }
 
 .exploration-layout > div {
-  max-width: 720px;
+  max-width: none;
 }
 
 .exploration-demo {
   margin: 0;
 }
 
-.exploration-demo iframe {
+.exploration-tables iframe,
+.exploration-stage iframe {
   display: block;
   width: 100%;
-  height: 920px;
   border: 1px solid rgba(246, 244, 238, 0.16);
   border-radius: 4px;
   background: #f7f4ee;
+}
+
+.exploration-tables iframe {
+  min-height: 320px;
+}
+
+.exploration-stage {
+  grid-column: 1 / -1;
+}
+
+.exploration-stage iframe {
+  min-height: 640px;
 }
 
 .exploration-demo figcaption {
@@ -1394,6 +1407,15 @@
   color: #657069;
   font-size: 0.96rem;
   line-height: 1.72;
+}
+
+.personal-case > .shell > div > .personal-subheading {
+  margin-top: 28px;
+  color: #738177;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
 }
 
 .personal-case-dark > .shell > div > p:not(.personal-case-number):not(.personal-result) {
@@ -1636,7 +1658,8 @@
   .personal-case-grid,
   .personal-about-grid,
   .configuration-details,
-  .configuration-analysis {
+  .configuration-analysis,
+  .exploration-layout {
     grid-template-columns: 1fr;
     gap: 38px;
   }
