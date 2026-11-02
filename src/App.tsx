@@ -120,7 +120,7 @@ function App() {
               <figure className="exploration-demo exploration-stage">
                 <iframe
                   title="Visit review"
-                  src={`${import.meta.env.BASE_URL}case-file.html?part=explorer&v=2`}
+                  src={`${import.meta.env.BASE_URL}case-file.html?part=explorer&v=3`}
                   style={{ height: explorerHeight }}
                 />
               </figure>
