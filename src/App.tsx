@@ -7,7 +7,6 @@ import remoteConfigurationFlow from './work/remote-configuration-flow.png'
 import remoteConfigurationUi from './work/remote-configuration-ui.png'
 import configurationDurationAnalysis from './work/configuration-duration-analysis.png'
 import configurationSignalAnalysis from './work/configuration-signal-analysis.png'
-import configurationParameterMap from './work/configuration-parameter-map.png'
 
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -153,10 +152,6 @@ function App() {
                   <figure className="personal-visual">
                     <img src={configurationSignalAnalysis} alt="Raw sensing hardware signals being inspected around an event." />
                     <figcaption>Inspecting real hardware signals behind an unexpected result.</figcaption>
-                  </figure>
-                  <figure className="personal-visual">
-                    <img src={configurationParameterMap} alt="A parameter map used to identify effective configuration ranges." />
-                    <figcaption>Testing parameter ranges to find a setting that performs well.</figcaption>
                   </figure>
                 </div>
               </div>
