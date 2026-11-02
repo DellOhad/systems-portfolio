@@ -1479,7 +1479,11 @@
 }
 
 .configuration-analysis-images .personal-visual img {
-  max-height: 245px;
+  aspect-ratio: 16 / 9;
+  height: clamp(150px, 16vw, 245px);
+  max-height: none;
+  object-fit: cover;
+  object-position: center bottom;
 }
 
 .personal-case-dark .personal-visual figcaption {
