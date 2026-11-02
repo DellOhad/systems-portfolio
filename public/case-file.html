@@ -21,12 +21,12 @@
   td { padding: 4px 6px; border-top: 1px solid #f5f5f4; white-space: nowrap; }
   tr.row { cursor: pointer; }
   tr.hit td { background: var(--hit); }
-  .action { display: flex; justify-content: flex-end; align-items: center; gap: 10px; min-height: 58px; margin-top: 14px; }
-  .nudge { display: flex; flex: none; align-items: center; gap: 5px; width: 170px; margin: 0; color: var(--red); font: 700 18px/1 "Bradley Hand", "Segoe Print", "Comic Sans MS", cursive; letter-spacing: 0.01em; white-space: normal; transform: translateX(12px) rotate(-5deg); }
+  .action { display: flex; justify-content: flex-end; align-items: center; gap: 16px; min-height: 58px; margin-top: 14px; padding-right: 28px; }
+  .nudge { position: relative; z-index: 2; display: flex; flex: none; align-items: center; gap: 5px; width: 170px; margin: 0; color: var(--red); font: 700 18px/1 "Bradley Hand", "Segoe Print", "Comic Sans MS", cursive; letter-spacing: 0.01em; white-space: normal; transform: rotate(-5deg); }
   .nudge span { display: inline-block; }
   .nudge span:first-child { transform: translateY(-4px) rotate(-3deg); }
   .nudge span:nth-child(2) { transform: translateY(3px) rotate(2deg); }
-  .arrow { width: 46px; height: 16px; flex: none; animation: point 0.9s ease-in-out infinite; }
+  .arrow { position: relative; width: 46px; height: 16px; flex: none; margin-right: -12px; z-index: 2; animation: point 0.9s ease-in-out infinite; }
   @keyframes point {
     0%, 100% { transform: translateX(0); }
     50% { transform: translateX(8px); }
@@ -34,7 +34,8 @@
   @media (prefers-reduced-motion: reduce) {
     .arrow { animation: none; }
   }
-  button.viz, button.back { border: 0; background: var(--ink); color: white; border-radius: 8px; padding: 10px 16px; font: inherit; font-weight: 650; cursor: pointer; }
+  button.viz, button.back { position: relative; z-index: 1; border: 0; background: var(--ink); color: white; border-radius: 8px; padding: 10px 16px; font: inherit; font-weight: 650; cursor: pointer; }
+  button.viz { transform: translateY(-4px); }
   button.back { background: transparent; color: var(--ink); border: 1px solid #d6d3d1; }
   button.viz:disabled { opacity: 0.4; cursor: default; }
   .hidden { display: none; }

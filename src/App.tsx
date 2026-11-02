@@ -66,11 +66,12 @@ function App() {
         <div className="personal-hero-content shell">
           <p className="personal-kicker">SYSTEMS SOFTWARE ENGINEER</p>
           <div className="personal-intro">
-            <h1>I build the bridge between real-world systems and the people who rely on them.</h1>
+            <h1>If you made it this far, we are already off to a good start - now let’s see what we could build together.</h1>
             <div>
               <p>
-                My work spans embedded devices, backend systems, data, and the practical tools
-                that help teams make sense of complex operations.
+                My work spans backend systems, embedded devices, data, and the tools that improve
+                system accuracy, reduce R&amp;D investigation time, and make complex technology
+                easier for operations teams to use.
               </p>
               <button className="personal-button" onClick={() => scrollToSection('work')}>
                 See selected work <span>↓</span>
@@ -103,15 +104,15 @@ function App() {
               </p>
               <p>
                 Bringing together the relevant signals, events, and possible interpretations made
-                investigations faster and easier to follow—helping the R&amp;D team focus on the
-                real issue, understand edge cases, and spend less time assembling evidence.
+                investigations faster and easier to follow—helping us in R&amp;D focus on the real
+                issue, understand edge cases, and spend less time assembling evidence.
               </p>
-              <p className="personal-result"><strong>What changed:</strong> the R&amp;D team could investigate the right issue faster, with a clearer view of complex behavior.</p>
+              <p className="personal-result"><strong>What changed:</strong> we could investigate the right issue faster, with a clearer view of complex behavior.</p>
             </div>
             <figure className="exploration-demo exploration-tables">
               <iframe
                 title="Files for one visit"
-                src={`${import.meta.env.BASE_URL}case-file.html?part=tables&v=2`}
+                src={`${import.meta.env.BASE_URL}case-file.html?part=tables&v=3`}
                 style={{ height: tablesHeight }}
               />
             </figure>
@@ -159,7 +160,7 @@ function App() {
               <figcaption>Configuration moves to deployed devices through backend services from the operations interface.</figcaption>
             </figure>
           </div>
-          {configurationExpanded && (
+          <div className={`configuration-details-wrapper${configurationExpanded ? ' is-open' : ''}`} aria-hidden={!configurationExpanded}>
             <div className="shell configuration-details" id="configuration-details">
               <div>
                 <p className="personal-case-number">HOW IT WORKS</p>
@@ -207,23 +208,24 @@ function App() {
                 </div>
               </div>
             </div>
-          )}
+          </div>
         </article>
 
         <article className="personal-case personal-case-warm">
           <div className="shell validation-case">
             <div>
               <p className="personal-case-number">03 / VALIDATION</p>
-              <h2>Seeing network readiness before a site goes live.</h2>
+              <h2>A live view for managing Wi-Fi across deployed sites.</h2>
               <p>
-                I created a live 3D view that makes a physical environment, its connected devices,
-                and its network state understandable at a glance during setup.
+                I created a live 3D view that brings a physical environment, its connected
+                devices, and its network state into one place.
               </p>
               <p>
-                It gives the people launching a site a clearer way to find Wi-Fi and connectivity
-                problems while they are still straightforward to address.
+                It supports both site setup and ongoing operations: checking network readiness,
+                managing Wi-Fi in active sites, and investigating connectivity issues with the
+                right physical context.
               </p>
-              <p className="personal-result"><strong>What changed:</strong> connectivity issues are visible before they become launch-day surprises.</p>
+              <p className="personal-result"><strong>Riddle:</strong> Can you find the problematic device? Is it a reception issue, an access-point configuration issue, or perhaps a power connection issue?</p>
             </div>
             <figure className="validation-demo">
               <iframe
@@ -240,16 +242,32 @@ function App() {
         <div className="shell personal-about-grid">
           <div>
             <p className="personal-kicker">ABOUT ME</p>
-            <h2>Systems work is people work.</h2>
+            <h2>Driven by continuous learning.</h2>
           </div>
           <p>
-            I bring a hardware and mechanics background to software problems, and I enjoy the
-            moments where different disciplines need to meet. I learn quickly, work well in
-            collaborative teams, and use AI tools thoughtfully for research, prototyping, and
-            communicating ideas clearly. What matters most to me is seeing useful work reach the
-            people it was built for.
+            I am a software and systems engineer with experience across backend services,
+            embedded software, data flows, and web tools. I enjoy working in unfamiliar domains,
+            tracing problems across layers, and finding better solutions from different
+            perspectives. My hardware and mechanics background helps me work comfortably where
+            disciplines meet. I work well in collaborative teams, use AI tools thoughtfully for
+            research and prototyping, and care most about seeing useful work reach the people it
+            was built for.
           </p>
         </div>
+        <footer className="shell personal-contact" aria-label="Contact details">
+          <a href="tel:+972546964464">
+            <span>PHONE</span>
+            +972 54 696 4464
+          </a>
+          <a href="mailto:ohaddel0@gmail.com">
+            <span>EMAIL</span>
+            ohaddel0@gmail.com
+          </a>
+          <a href="https://www.linkedin.com/in/ohad-dell/" target="_blank" rel="noreferrer">
+            <span>LINKEDIN</span>
+            linkedin.com/in/ohad-dell
+          </a>
+        </footer>
       </section>
 
       {expandedImage && (

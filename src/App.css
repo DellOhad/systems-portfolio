@@ -1496,6 +1496,23 @@
   max-height: 250px;
 }
 
+.configuration-details-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 650ms cubic-bezier(0.22, 1, 0.36, 1), opacity 240ms ease;
+}
+
+.configuration-details-wrapper.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.configuration-details-wrapper > .configuration-details {
+  min-height: 0;
+  overflow: hidden;
+}
+
 .configuration-details {
   display: grid;
   grid-template-columns: minmax(250px, 0.62fr) minmax(0, 1.38fr);
@@ -1653,6 +1670,34 @@
   line-height: 1.75;
 }
 
+.personal-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px 54px;
+  margin-top: 76px;
+  padding-top: 25px;
+  border-top: 1px solid rgba(247, 243, 236, 0.35);
+}
+
+.personal-contact a {
+  color: #f7f3ec;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.personal-contact a:hover {
+  color: #f3cf7f;
+}
+
+.personal-contact span {
+  display: block;
+  margin-bottom: 7px;
+  color: #f3cf7f;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
 @media (max-width: 880px) {
   .personal-intro,
   .personal-case-grid,
@@ -1677,6 +1722,10 @@
 
   .personal-note {
     margin-top: 65px;
+  }
+
+  .personal-contact {
+    margin-top: 54px;
   }
 }
 
