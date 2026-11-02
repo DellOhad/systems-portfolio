@@ -1442,6 +1442,38 @@
   max-height: 320px;
 }
 
+.configuration-analysis {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(250px, 0.62fr) minmax(0, 1.38fr);
+  gap: 75px;
+  margin-top: 8px;
+  padding-top: 50px;
+  border-top: 1px solid #d5d9d3;
+}
+
+.configuration-analysis > div > p:not(.personal-case-number) {
+  margin: 17px 0 0;
+  color: #657069;
+  font-size: 0.9rem;
+  line-height: 1.68;
+}
+
+.configuration-analysis-images {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.configuration-analysis-images .personal-visual:first-child {
+  grid-column: 1 / -1;
+}
+
+.configuration-analysis-images .personal-visual img {
+  max-height: 245px;
+}
+
 .personal-case-dark .personal-visual figcaption {
   color: #9eaaa1;
 }
@@ -1481,7 +1513,8 @@
   .personal-intro,
   .personal-case-grid,
   .personal-about-grid,
-  .configuration-details {
+  .configuration-details,
+  .configuration-analysis {
     grid-template-columns: 1fr;
     gap: 38px;
   }

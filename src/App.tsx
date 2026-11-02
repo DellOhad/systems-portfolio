@@ -5,6 +5,9 @@ import networkValidation from './work/network-validation.png'
 import remoteConfiguration from './work/remote-configuration.png'
 import remoteConfigurationFlow from './work/remote-configuration-flow.png'
 import remoteConfigurationUi from './work/remote-configuration-ui.png'
+import configurationDurationAnalysis from './work/configuration-duration-analysis.png'
+import configurationSignalAnalysis from './work/configuration-signal-analysis.png'
+import configurationParameterMap from './work/configuration-parameter-map.png'
 
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -131,6 +134,30 @@ function App() {
                   <img src={remoteConfiguration} alt="A hand-drawn sketch of device-side configuration and syncing." />
                   <figcaption>An early device-side configuration and sync design.</figcaption>
                 </figure>
+              </div>
+              <div className="configuration-analysis">
+                <div>
+                  <p className="personal-case-number">TESTING THE SETTINGS</p>
+                  <h3>Check changes against real signal behavior.</h3>
+                  <p>
+                    I built analysis tools to compare outcomes before and after a change, inspect
+                    raw device signals, and explore which parameter combinations work best.
+                  </p>
+                </div>
+                <div className="configuration-analysis-images">
+                  <figure className="personal-visual">
+                    <img src={configurationDurationAnalysis} alt="A before-and-after comparison of event durations." />
+                    <figcaption>Comparing event behavior before and after a configuration change.</figcaption>
+                  </figure>
+                  <figure className="personal-visual">
+                    <img src={configurationSignalAnalysis} alt="Raw sensing hardware signals being inspected around an event." />
+                    <figcaption>Inspecting raw signals around a difficult event.</figcaption>
+                  </figure>
+                  <figure className="personal-visual">
+                    <img src={configurationParameterMap} alt="A parameter map used to identify effective configuration ranges." />
+                    <figcaption>Exploring parameter ranges instead of tuning by guesswork.</figcaption>
+                  </figure>
+                </div>
               </div>
             </div>
           )}
